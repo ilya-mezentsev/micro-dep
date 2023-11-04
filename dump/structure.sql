@@ -27,24 +27,18 @@ CREATE TABLE IF NOT EXISTS auth_token(
 
 CREATE TABLE IF NOT EXISTS service(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-    owner_id VARCHAR(36) REFERENCES author(id),
+    author_id VARCHAR(36) REFERENCES author(id),
 
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) UNIQUE NOT NULL,
     description VARCHAR(500)
-);
-
-CREATE TABLE IF NOT EXISTS service_endpoint_info(
-    id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
-
-    kind VARCHAR(42) NOT NULL,
-    address VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS service_endpoint(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
 
     service_id VARCHAR(36) REFERENCES service(id),
-    type_id VARCHAR(36) REFERENCES service_endpoint_info(id)
+    kind VARCHAR(42) NOT NULL,
+    address VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS dependency(
