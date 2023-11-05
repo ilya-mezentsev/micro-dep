@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -11,41 +10,7 @@ import (
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	entityMocks "github.com/ilya-mezentsev/micro-dep/store/internal/services/entity/mocks"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
-)
-
-var (
-	someError = errors.New("some-error")
-
-	allEndpoints = []shared.Endpoint{
-		{
-			Id: "endpoint-1",
-		},
-		{
-			Id: "endpoint-2",
-		},
-		{
-			Id: "endpoint-3",
-		},
-		{
-			Id: "endpoint-4",
-		},
-		{
-			Id: "endpoint-5",
-		},
-		{
-			Id: "endpoint-6",
-		},
-	}
-	entities = []shared.Entity{
-		{
-			Id:        "some-id-1",
-			Endpoints: allEndpoints[:3],
-		},
-		{
-			Id:        "some-id-2",
-			Endpoints: allEndpoints[3:],
-		},
-	}
+	sharedMocks "github.com/ilya-mezentsev/micro-dep/store/internal/services/shared/mocks"
 )
 
 func TestServiceImpl_Create(t *testing.T) {
@@ -70,11 +35,11 @@ func TestServiceImpl_Create(t *testing.T) {
 			name: "failed creation due to repo.Exists error",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().Exists(mock.Anything).Return(false, someError)
+				m.EXPECT().Exists(mock.Anything).Return(false, sharedMocks.SomeError)
 
 				return m
 			},
-			expected: someError,
+			expected: sharedMocks.SomeError,
 		},
 
 		{
@@ -92,12 +57,12 @@ func TestServiceImpl_Create(t *testing.T) {
 			name: "failed creation due to repo.Create error",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().Create(mock.Anything).Return(someError)
+				m.EXPECT().Create(mock.Anything).Return(sharedMocks.SomeError)
 				m.EXPECT().Exists(mock.Anything).Return(false, nil)
 
 				return m
 			},
-			expected: someError,
+			expected: sharedMocks.SomeError,
 		},
 	}
 
@@ -121,11 +86,11 @@ func TestServiceImpl_ReadAll(t *testing.T) {
 			name: "ok",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().ReadAll().Return(entities, nil)
+				m.EXPECT().ReadAll().Return(sharedMocks.Entities, nil)
 
 				return m
 			},
-			expectedDTOs: entities,
+			expectedDTOs: sharedMocks.Entities,
 			expectedErr:  nil,
 		},
 
@@ -133,12 +98,12 @@ func TestServiceImpl_ReadAll(t *testing.T) {
 			name: "error",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().ReadAll().Return(nil, someError)
+				m.EXPECT().ReadAll().Return(nil, sharedMocks.SomeError)
 
 				return m
 			},
 			expectedDTOs: nil,
-			expectedErr:  someError,
+			expectedErr:  sharedMocks.SomeError,
 		},
 	}
 
@@ -165,12 +130,12 @@ func TestServiceImpl_ReadOne(t *testing.T) {
 			name: "ok",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().ReadOne(entities[0].Id).Return(entities[0], nil)
+				m.EXPECT().ReadOne(sharedMocks.Entities[0].Id).Return(sharedMocks.Entities[0], nil)
 
 				return m
 			},
-			entityId:    entities[0].Id,
-			expectedDTO: entities[0],
+			entityId:    sharedMocks.Entities[0].Id,
+			expectedDTO: sharedMocks.Entities[0],
 			expectedErr: nil,
 		},
 
@@ -178,11 +143,11 @@ func TestServiceImpl_ReadOne(t *testing.T) {
 			name: "IdMissingInStorage error",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().ReadOne(entities[0].Id).Return(shared.Entity{}, errs.IdMissingInStorage)
+				m.EXPECT().ReadOne(sharedMocks.Entities[0].Id).Return(shared.Entity{}, errs.IdMissingInStorage)
 
 				return m
 			},
-			entityId:    entities[0].Id,
+			entityId:    sharedMocks.Entities[0].Id,
 			expectedDTO: shared.Entity{},
 			expectedErr: shared.NotFoundById,
 		},
@@ -191,13 +156,13 @@ func TestServiceImpl_ReadOne(t *testing.T) {
 			name: "general error",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().ReadOne(entities[0].Id).Return(shared.Entity{}, someError)
+				m.EXPECT().ReadOne(sharedMocks.Entities[0].Id).Return(shared.Entity{}, sharedMocks.SomeError)
 
 				return m
 			},
-			entityId:    entities[0].Id,
+			entityId:    sharedMocks.Entities[0].Id,
 			expectedDTO: shared.Entity{},
-			expectedErr: someError,
+			expectedErr: sharedMocks.SomeError,
 		},
 	}
 
@@ -222,24 +187,24 @@ func TestServiceImpl_Update(t *testing.T) {
 	}{
 		{
 			name:        "ok",
-			entityModel: entities[0],
+			entityModel: sharedMocks.Entities[0],
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(allEndpoints[:2], nil)
-				m.EXPECT().Update(entities[0]).Return(entities[0], nil)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.AllEndpoints[:2], nil)
+				m.EXPECT().Update(sharedMocks.Entities[0]).Return(sharedMocks.Entities[0], nil)
 
 				return m
 			},
-			expectedDTO: entities[0],
+			expectedDTO: sharedMocks.Entities[0],
 			expectedErr: nil,
 		},
 
 		{
 			name:        "IdMissingInStorage error",
-			entityModel: entities[0],
+			entityModel: sharedMocks.Entities[0],
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(nil, errs.IdMissingInStorage)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(nil, errs.IdMissingInStorage)
 
 				return m
 			},
@@ -249,23 +214,23 @@ func TestServiceImpl_Update(t *testing.T) {
 
 		{
 			name:        "general error",
-			entityModel: entities[0],
+			entityModel: sharedMocks.Entities[0],
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(nil, someError)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(nil, sharedMocks.SomeError)
 
 				return m
 			},
 			expectedDTO: shared.Entity{},
-			expectedErr: someError,
+			expectedErr: sharedMocks.SomeError,
 		},
 
 		{
 			name:        "TryingToRemoveEndpointThatIsInUse error",
-			entityModel: entities[0],
+			entityModel: sharedMocks.Entities[0],
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(allEndpoints[:4], nil)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.AllEndpoints[:4], nil)
 
 				return m
 			},
@@ -294,11 +259,11 @@ func TestServiceImpl_Delete(t *testing.T) {
 	}{
 		{
 			name:     "ok",
-			entityId: entities[0].Id,
+			entityId: sharedMocks.Entities[0].Id,
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(nil, nil)
-				m.EXPECT().Delete(entities[0].Id).Return(nil)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(nil, nil)
+				m.EXPECT().Delete(sharedMocks.Entities[0].Id).Return(nil)
 
 				return m
 			},
@@ -307,10 +272,10 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 		{
 			name:     "IdMissingInStorage error",
-			entityId: entities[0].Id,
+			entityId: sharedMocks.Entities[0].Id,
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(nil, errs.IdMissingInStorage)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(nil, errs.IdMissingInStorage)
 
 				return m
 			},
@@ -319,22 +284,22 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 		{
 			name:     "general error",
-			entityId: entities[0].Id,
+			entityId: sharedMocks.Entities[0].Id,
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(nil, someError)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(nil, sharedMocks.SomeError)
 
 				return m
 			},
-			expectedErr: someError,
+			expectedErr: sharedMocks.SomeError,
 		},
 
 		{
 			name:     "TryingToRemoveEntityThatIsUse error",
-			entityId: entities[0].Id,
+			entityId: sharedMocks.Entities[0].Id,
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(entities[0].Id).Return(allEndpoints[:3], nil)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.AllEndpoints[:3], nil)
 
 				return m
 			},

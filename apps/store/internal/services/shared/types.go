@@ -12,8 +12,15 @@ type (
 	}
 
 	Endpoint struct {
-		Id      models.Id
-		Kind    string
-		Address string
+		Id       models.Id
+		EntityId models.Id
+		Kind     string
+		Address  string
+	}
+
+	Relation struct {
+		Id            models.Id
+		FromServiceId models.Id
+		ToEndpointId  models.Id
 	}
 )

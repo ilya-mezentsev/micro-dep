@@ -9,6 +9,8 @@ ENTRYPOINT := cmd/main.go
 
 mocks: store-mocks
 
+test: store-test
+
 user-run:
 	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go run $(ENTRYPOINT)
 
@@ -20,3 +22,6 @@ store-tidy:
 
 store-mocks:
 	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) mockery
+
+store-test:
+	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go test -cover ./internal/... | { grep -v "no test files"; true; }

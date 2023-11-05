@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS service_endpoint(
 
     service_id VARCHAR(36) REFERENCES service(id),
     kind VARCHAR(42) NOT NULL,
-    address VARCHAR(100)
+    address VARCHAR(100),
+
+    UNIQUE (service_id, kind, address)
 );
 
 CREATE TABLE IF NOT EXISTS dependency(
