@@ -1,23 +1,23 @@
 package app
 
 import (
+	"github.com/ilya-mezentsev/micro-dep/store/internal/transport/web"
+	"os"
+
+	"github.com/ilya-mezentsev/micro-dep/shared/services/config"
 	"github.com/ilya-mezentsev/micro-dep/shared/services/db/connection"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/configs"
 )
 
+type Config struct {
+	DB  configs.DB  `json:"db"`
+	Web configs.Web `json:"web"`
+}
+
 func Main() {
-	_ = connection.MustGetConnection(configs.DB{
-		Host:     "localhost",
-		Port:     5432,
-		User:     "user",
-		Password: "password",
-		DBName:   "dep",
-		Connection: struct {
-			RetryCount   int `json:"retry_count"`
-			RetryTimeout int `json:"retry_timeout"`
-		}{
-			RetryCount:   2,
-			RetryTimeout: 5,
-		},
-	})
+	settings := config.MustParse[Config](os.Getenv("CONFIG_PATH"))
+	db := connection.MustGetConnection(settings.DB)
+	servicesFactory := NewServicesFactory(db)
+
+	web.Start(settings.Web, servicesFactory.Services)
 }

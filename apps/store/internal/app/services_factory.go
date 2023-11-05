@@ -16,6 +16,13 @@ type ServicesFactory struct {
 	account2services map[models.Id]services.Services
 }
 
+func NewServicesFactory(db *sqlx.DB) *ServicesFactory {
+	return &ServicesFactory{
+		db:               db,
+		account2services: map[models.Id]services.Services{},
+	}
+}
+
 func (sf *ServicesFactory) Services(accountId models.Id) services.Services {
 	sf.Lock()
 	defer sf.Unlock()
