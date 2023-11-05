@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS auth_token(
     expired_at BIGINT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS service(
+CREATE TABLE IF NOT EXISTS entity(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
     author_id VARCHAR(36) REFERENCES author(id),
 
@@ -33,19 +33,26 @@ CREATE TABLE IF NOT EXISTS service(
     description VARCHAR(500)
 );
 
-CREATE TABLE IF NOT EXISTS service_endpoint(
+CREATE TABLE IF NOT EXISTS entity_endpoint(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
 
-    service_id VARCHAR(36) REFERENCES service(id),
+    entity_id VARCHAR(36) REFERENCES entity(id),
     kind VARCHAR(42) NOT NULL,
     address VARCHAR(100),
 
-    UNIQUE (service_id, kind, address)
+    UNIQUE (entity_id, kind, address)
 );
 
 CREATE TABLE IF NOT EXISTS dependency(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
 
-    from_id VARCHAR(36) REFERENCES service(id),
-    to_id VARCHAR(36) REFERENCES service_endpoint(id)
+    from_id VARCHAR(36) REFERENCES entity(id),
+    to_id VARCHAR(36) REFERENCES entity_endpoint(id)
 );
+
+CREATE OR REPLACE VIEW account_linked_entity AS
+SELECT
+    s.*,
+    a.account_id
+FROM entity s
+INNER JOIN author a on s.author_id = a.id;
