@@ -21,11 +21,11 @@ func TestServiceImpl_Create(t *testing.T) {
 	}{
 		{
 			name:  "ok",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(sharedMocks.AllEndpoints[0]).Return(nil)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
+				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(nil)
 
 				return m
 			},
@@ -34,10 +34,10 @@ func TestServiceImpl_Create(t *testing.T) {
 
 		{
 			name:  "IdMissingInStorage error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(false, false, errs.IdMissingInStorage)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(false, false, errs.IdMissingInStorage)
 
 				return m
 			},
@@ -46,10 +46,10 @@ func TestServiceImpl_Create(t *testing.T) {
 
 		{
 			name:  "some error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(false, false, sharedMocks.SomeError)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(false, false, sharedMocks.SomeError)
 
 				return m
 			},
@@ -58,10 +58,10 @@ func TestServiceImpl_Create(t *testing.T) {
 
 		{
 			name:  "entity does not exists error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(false, false, nil)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(false, false, nil)
 
 				return m
 			},
@@ -70,10 +70,10 @@ func TestServiceImpl_Create(t *testing.T) {
 
 		{
 			name:  "endpoint exists error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(true, true, nil)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, true, nil)
 
 				return m
 			},
@@ -82,11 +82,11 @@ func TestServiceImpl_Create(t *testing.T) {
 
 		{
 			name:  "creation error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(sharedMocks.AllEndpoints[0]).Return(sharedMocks.SomeError)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
+				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(sharedMocks.SomeError)
 
 				return m
 			},
@@ -113,24 +113,24 @@ func TestServiceImpl_Update(t *testing.T) {
 	}{
 		{
 			name:  "ok",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(true, true, nil)
-				m.EXPECT().Update(sharedMocks.AllEndpoints[0]).Return(sharedMocks.AllEndpoints[0], nil)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, true, nil)
+				m.EXPECT().Update(sharedMocks.Endpoints[0]).Return(sharedMocks.Endpoints[0], nil)
 
 				return m
 			},
-			expectedModel: sharedMocks.AllEndpoints[0],
+			expectedModel: sharedMocks.Endpoints[0],
 			expectedError: nil,
 		},
 
 		{
 			name:  "IdMissingInStorage error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(false, false, errs.IdMissingInStorage)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(false, false, errs.IdMissingInStorage)
 
 				return m
 			},
@@ -140,10 +140,10 @@ func TestServiceImpl_Update(t *testing.T) {
 
 		{
 			name:  "some error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(false, false, sharedMocks.SomeError)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(false, false, sharedMocks.SomeError)
 
 				return m
 			},
@@ -153,10 +153,10 @@ func TestServiceImpl_Update(t *testing.T) {
 
 		{
 			name:  "endpoint does not exists error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(true, false, nil)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
 
 				return m
 			},
@@ -166,11 +166,11 @@ func TestServiceImpl_Update(t *testing.T) {
 
 		{
 			name:  "update error",
-			model: sharedMocks.AllEndpoints[0],
+			model: sharedMocks.Endpoints[0],
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().Exists(sharedMocks.AllEndpoints[0]).Return(true, true, nil)
-				m.EXPECT().Update(sharedMocks.AllEndpoints[0]).Return(shared.Endpoint{}, sharedMocks.SomeError)
+				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, true, nil)
+				m.EXPECT().Update(sharedMocks.Endpoints[0]).Return(shared.Endpoint{}, sharedMocks.SomeError)
 
 				return m
 			},
@@ -199,11 +199,11 @@ func TestServiceImpl_Delete(t *testing.T) {
 	}{
 		{
 			name:    "ok",
-			modelId: sharedMocks.AllEndpoints[0].Id,
+			modelId: sharedMocks.Endpoints[0].Id,
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().HasRelation(sharedMocks.AllEndpoints[0].Id).Return(false, nil)
-				m.EXPECT().Delete(sharedMocks.AllEndpoints[0].Id).Return(nil)
+				m.EXPECT().HasRelation(sharedMocks.Endpoints[0].Id).Return(false, nil)
+				m.EXPECT().Delete(sharedMocks.Endpoints[0].Id).Return(nil)
 
 				return m
 			},
@@ -212,10 +212,10 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 		{
 			name:    "IdMissingInStorage error",
-			modelId: sharedMocks.AllEndpoints[0].Id,
+			modelId: sharedMocks.Endpoints[0].Id,
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().HasRelation(sharedMocks.AllEndpoints[0].Id).Return(false, errs.IdMissingInStorage)
+				m.EXPECT().HasRelation(sharedMocks.Endpoints[0].Id).Return(false, errs.IdMissingInStorage)
 
 				return m
 			},
@@ -224,10 +224,10 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 		{
 			name:    "some error",
-			modelId: sharedMocks.AllEndpoints[0].Id,
+			modelId: sharedMocks.Endpoints[0].Id,
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().HasRelation(sharedMocks.AllEndpoints[0].Id).Return(false, sharedMocks.SomeError)
+				m.EXPECT().HasRelation(sharedMocks.Endpoints[0].Id).Return(false, sharedMocks.SomeError)
 
 				return m
 			},
@@ -236,10 +236,10 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 		{
 			name:    "relation exists error",
-			modelId: sharedMocks.AllEndpoints[0].Id,
+			modelId: sharedMocks.Endpoints[0].Id,
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().HasRelation(sharedMocks.AllEndpoints[0].Id).Return(true, nil)
+				m.EXPECT().HasRelation(sharedMocks.Endpoints[0].Id).Return(true, nil)
 
 				return m
 			},
@@ -248,11 +248,11 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 		{
 			name:    "deletion error",
-			modelId: sharedMocks.AllEndpoints[0].Id,
+			modelId: sharedMocks.Endpoints[0].Id,
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
-				m.EXPECT().HasRelation(sharedMocks.AllEndpoints[0].Id).Return(false, nil)
-				m.EXPECT().Delete(sharedMocks.AllEndpoints[0].Id).Return(sharedMocks.SomeError)
+				m.EXPECT().HasRelation(sharedMocks.Endpoints[0].Id).Return(false, nil)
+				m.EXPECT().Delete(sharedMocks.Endpoints[0].Id).Return(sharedMocks.SomeError)
 
 				return m
 			},

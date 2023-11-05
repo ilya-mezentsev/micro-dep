@@ -11,3 +11,7 @@ packages:
     github.com/ilya-mezentsev/micro-dep/store/internal/services/endpoint:
         interfaces:
             Repo:
+
+    github.com/ilya-mezentsev/micro-dep/store/internal/services/relation:
+        interfaces:
+            Repo:

@@ -32,4 +32,10 @@ type (
 		Updater[T]
 		Deleter
 	}
+
+	CRD[T any] interface {
+		Creator[T]
+		Reader[T]
+		Deleter
+	}
 )

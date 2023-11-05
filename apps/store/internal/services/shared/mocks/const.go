@@ -8,7 +8,19 @@ import (
 var (
 	SomeError = errors.New("some-error")
 
-	AllEndpoints = []shared.Endpoint{
+	Relations = []shared.Relation{
+		{
+			Id: "relation-1",
+		},
+		{
+			Id: "relation-2",
+		},
+		{
+			Id: "relation-3",
+		},
+	}
+
+	Endpoints = []shared.Endpoint{
 		{
 			Id: "endpoint-1",
 		},
@@ -32,11 +44,11 @@ var (
 	Entities = []shared.Entity{
 		{
 			Id:        "some-id-1",
-			Endpoints: AllEndpoints[:3],
+			Endpoints: Endpoints[:3],
 		},
 		{
 			Id:        "some-id-2",
-			Endpoints: AllEndpoints[3:],
+			Endpoints: Endpoints[3:],
 		},
 	}
 )

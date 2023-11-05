@@ -190,7 +190,7 @@ func TestServiceImpl_Update(t *testing.T) {
 			entityModel: sharedMocks.Entities[0],
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.AllEndpoints[:2], nil)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.Endpoints[:2], nil)
 				m.EXPECT().Update(sharedMocks.Entities[0]).Return(sharedMocks.Entities[0], nil)
 
 				return m
@@ -230,7 +230,7 @@ func TestServiceImpl_Update(t *testing.T) {
 			entityModel: sharedMocks.Entities[0],
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.AllEndpoints[:4], nil)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.Endpoints[:4], nil)
 
 				return m
 			},
@@ -299,7 +299,7 @@ func TestServiceImpl_Delete(t *testing.T) {
 			entityId: sharedMocks.Entities[0].Id,
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.AllEndpoints[:3], nil)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.Endpoints[:3], nil)
 
 				return m
 			},
