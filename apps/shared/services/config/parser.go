@@ -9,7 +9,7 @@ import (
 func MustParse[T any](path string) T {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		panic(fmt.Errorf("unable to read settings file: %v", err))
+		panic(fmt.Errorf("unable to read settings file: %s, err: %v", path, err))
 	}
 
 	var s T

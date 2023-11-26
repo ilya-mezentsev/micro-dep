@@ -19,8 +19,8 @@ type (
 	}
 
 	Relation struct {
-		Id            models.Id
-		FromServiceId models.Id
-		ToEndpointId  models.Id
+		Id           models.Id
+		FromEntityId models.Id
+		ToEndpointId models.Id
 	}
 )

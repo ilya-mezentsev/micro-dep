@@ -2,6 +2,7 @@ package mocks
 
 import (
 	"errors"
+
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
 

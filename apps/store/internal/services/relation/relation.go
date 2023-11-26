@@ -2,6 +2,7 @@ package relation
 
 import (
 	"errors"
+
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
@@ -36,7 +37,7 @@ func (s ServiceImpl) ReadAll() ([]shared.Relation, error) {
 	return s.repo.ReadAll()
 }
 
-func (s ServiceImpl) ReadOne(id models.Id) (shared.Relation, error) {
+func (s ServiceImpl) ReadOne(_ models.Id) (shared.Relation, error) {
 	panic("not implemented")
 }
 

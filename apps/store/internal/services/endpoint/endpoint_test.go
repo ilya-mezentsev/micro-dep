@@ -1,15 +1,15 @@
 package endpoint
 
 import (
-	"github.com/ilya-mezentsev/micro-dep/shared/errs"
-	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
-	sharedMocks "github.com/ilya-mezentsev/micro-dep/store/internal/services/shared/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/ilya-mezentsev/micro-dep/shared/errs"
+	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	endpointMocks "github.com/ilya-mezentsev/micro-dep/store/internal/services/endpoint/mocks"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
+	sharedMocks "github.com/ilya-mezentsev/micro-dep/store/internal/services/shared/mocks"
 )
 
 func TestServiceImpl_Create(t *testing.T) {

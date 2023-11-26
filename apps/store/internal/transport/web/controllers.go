@@ -29,8 +29,8 @@ func Start(webSettings configs.Web, servicesFactory func(id models.Id) services.
 			return
 		}
 
-		services := servicesFactory(models.Id(accountId))
-		entities, err := services.Entity().ReadAll()
+		accountServices := servicesFactory(models.Id(accountId))
+		entities, err := accountServices.Entity().ReadAll()
 		if err != nil {
 			context.JSON(http.StatusInternalServerError, Response{Message: err.Error()})
 		} else {

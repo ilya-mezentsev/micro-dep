@@ -27,10 +27,13 @@ CREATE TABLE IF NOT EXISTS auth_token(
 
 CREATE TABLE IF NOT EXISTS entity(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
+    account_id VARCHAR(36) REFERENCES account(id),
     author_id VARCHAR(36) REFERENCES author(id),
 
-    name VARCHAR(100) UNIQUE NOT NULL,
-    description VARCHAR(500)
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+
+    UNIQUE (account_id, author_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS entity_endpoint(
@@ -49,13 +52,6 @@ CREATE TABLE IF NOT EXISTS dependency(
     from_id VARCHAR(36) REFERENCES entity(id),
     to_id VARCHAR(36) REFERENCES entity_endpoint(id)
 );
-
-CREATE OR REPLACE VIEW account_linked_entity AS
-SELECT
-    s.*,
-    a.account_id
-FROM entity s
-INNER JOIN author a on s.author_id = a.id;
 
 -- some test data
 
@@ -78,12 +74,14 @@ INSERT INTO auth_token(author_id, value, created_at, expired_at) VALUES
         'b3752f1e705230fbd4ab3732357774cb', 1699191471, 1699291471
     );
 
-INSERT INTO entity(author_id, name, description) VALUES
+INSERT INTO entity(account_id, author_id, name, description) VALUES
     (
+        (SELECT id FROM account LIMIT 1),
         (SELECT id FROM author LIMIT 1),
         'service-1', 'some first service'
     ),
     (
+        (SELECT id FROM account LIMIT 1),
         (SELECT id FROM author LIMIT 1),
         'service-2', 'some second service'
     );
