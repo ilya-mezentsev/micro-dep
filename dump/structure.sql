@@ -67,11 +67,13 @@ INSERT INTO author(account_id, username, password, registered_at, permissions_ki
 INSERT INTO auth_token(author_id, value, created_at, expired_at) VALUES
     (
         (SELECT id FROM author LIMIT 1),
-        'f93676f8f379c74cefc0d9959d843ac0', 1699191331, 1699291331
+        'f93676f8f379c74cefc0d9959d843ac0', 1699191331,
+        (SELECT EXTRACT(EPOCH FROM TIMESTAMP '2042-12-12'))
     ),
     (
         (SELECT id FROM author LIMIT 1 OFFSET 1),
-        'b3752f1e705230fbd4ab3732357774cb', 1699191471, 1699291471
+        'b3752f1e705230fbd4ab3732357774cb', 1699191471,
+        (SELECT EXTRACT(EPOCH FROM TIMESTAMP '2042-12-12'))
     );
 
 INSERT INTO entity(account_id, author_id, name, description) VALUES
