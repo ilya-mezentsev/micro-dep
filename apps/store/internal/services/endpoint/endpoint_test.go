@@ -25,7 +25,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
 				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(nil)
+				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(shared.Endpoint{}, nil)
 
 				return m
 			},
@@ -86,7 +86,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
 				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(sharedMocks.SomeError)
+				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(shared.Endpoint{}, sharedMocks.SomeError)
 
 				return m
 			},
@@ -97,8 +97,9 @@ func TestServiceImpl_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewServiceImpl(tt.mockConstructor())
+			_, err := s.Create(tt.model)
 
-			require.Equal(t, tt.expected, s.Create(tt.model))
+			require.Equal(t, tt.expected, err)
 		})
 	}
 }
@@ -267,20 +268,4 @@ func TestServiceImpl_Delete(t *testing.T) {
 			require.Equal(t, tt.expected, s.Delete(tt.modelId))
 		})
 	}
-}
-
-func TestServiceImpl_ReadAll(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-
-	_, _ = NewServiceImpl(nil).ReadAll()
-}
-
-func TestServiceImpl_ReadOne(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-
-	_, _ = NewServiceImpl(nil).ReadOne("")
 }

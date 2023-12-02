@@ -16,12 +16,12 @@ func NewServiceImpl(repo Repo) ServiceImpl {
 	return ServiceImpl{repo: repo}
 }
 
-func (s ServiceImpl) Create(model shared.Entity) error {
+func (s ServiceImpl) Create(model shared.Entity) (shared.Entity, error) {
 	exists, err := s.repo.Exists(model.Name)
 	if err != nil {
-		return err
+		return shared.Entity{}, err
 	} else if exists {
-		return shared.AlreadyExists
+		return shared.Entity{}, shared.AlreadyExists
 	}
 
 	return s.repo.Create(model)

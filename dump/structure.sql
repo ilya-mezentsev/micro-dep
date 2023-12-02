@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS entity(
 CREATE TABLE IF NOT EXISTS entity_endpoint(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
 
-    entity_id VARCHAR(36) REFERENCES entity(id),
+    entity_id VARCHAR(36) REFERENCES entity(id) ON DELETE CASCADE,
     kind VARCHAR(42) NOT NULL,
     address VARCHAR(500),
 

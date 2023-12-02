@@ -25,7 +25,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := relationMocks.NewMockRepo(t)
 				m.EXPECT().PartsExist(sharedMocks.Relations[0]).Return(true, true, nil)
-				m.EXPECT().Create(sharedMocks.Relations[0]).Return(nil)
+				m.EXPECT().Create(sharedMocks.Relations[0]).Return(sharedMocks.Relations[0], nil)
 
 				return m
 			},
@@ -86,7 +86,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := relationMocks.NewMockRepo(t)
 				m.EXPECT().PartsExist(sharedMocks.Relations[0]).Return(true, true, nil)
-				m.EXPECT().Create(sharedMocks.Relations[0]).Return(sharedMocks.SomeError)
+				m.EXPECT().Create(sharedMocks.Relations[0]).Return(shared.Relation{}, sharedMocks.SomeError)
 
 				return m
 			},
@@ -97,8 +97,9 @@ func TestServiceImpl_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewServiceImpl(tt.mockConstructor())
+			_, err := s.Create(tt.model)
 
-			require.Equal(t, tt.expected, s.Create(tt.model))
+			require.Equal(t, tt.expected, err)
 		})
 	}
 }
@@ -138,9 +139,9 @@ func TestServiceImpl_ReadAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewServiceImpl(tt.mockConstructor())
-			models, err := s.ReadAll()
+			allModels, err := s.ReadAll()
 
-			require.Equal(t, tt.expectedModels, models)
+			require.Equal(t, tt.expectedModels, allModels)
 			require.Equal(t, tt.expectedError, err)
 		})
 	}
@@ -151,15 +152,7 @@ func TestServiceImpl_ReadOne(t *testing.T) {
 		require.NotNil(t, recover())
 	}()
 
-	NewServiceImpl(relationMocks.NewMockRepo(t)).ReadOne(sharedMocks.Relations[0].Id)
-}
-
-func TestServiceImpl_Update(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-
-	NewServiceImpl(relationMocks.NewMockRepo(t)).Update(sharedMocks.Relations[0])
+	_, _ = NewServiceImpl(relationMocks.NewMockRepo(t)).ReadOne(sharedMocks.Relations[0].Id)
 }
 
 func TestServiceImpl_Delete(t *testing.T) {

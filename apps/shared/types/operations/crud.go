@@ -4,7 +4,7 @@ import "github.com/ilya-mezentsev/micro-dep/shared/types/models"
 
 type (
 	Creator[T any] interface {
-		Create(model T) error
+		Create(model T) (T, error)
 	}
 
 	Reader[T any] interface {

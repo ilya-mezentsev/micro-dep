@@ -17,7 +17,9 @@ var errNoAccountIdInContext = errors.New("unknown-error")
 
 type controllerMixins[T any] struct {
 	servicesFactory func(id models.Id) services.Services
-	serviceFn       func(ss services.Services) operations.CRUD[T]
+
+	// serviceFn - callback that returns concrete service for request processing
+	serviceFn func(ss services.Services) any
 }
 
 func (cm controllerMixins[T]) ReadAll(context *gin.Context) {
@@ -26,7 +28,13 @@ func (cm controllerMixins[T]) ReadAll(context *gin.Context) {
 		return
 	}
 
-	responseModels, err := cm.serviceFn(ss).ReadAll()
+	service, ok := cm.serviceFn(ss).(operations.Reader[T])
+	if !ok {
+		rb.NotImplemented()
+		return
+	}
+
+	responseModels, err := service.ReadAll()
 	if err != nil {
 		cm.onError(rb, err)
 	} else {
@@ -40,7 +48,13 @@ func (cm controllerMixins[T]) ReadOne(context *gin.Context) {
 		return
 	}
 
-	entityModel, err := cm.serviceFn(ss).ReadOne(models.Id(context.Param("id")))
+	service, ok := cm.serviceFn(ss).(operations.Reader[T])
+	if !ok {
+		rb.NotImplemented()
+		return
+	}
+
+	entityModel, err := service.ReadOne(models.Id(context.Param("id")))
 	if err != nil {
 		cm.onError(rb, err)
 	} else {
@@ -54,17 +68,23 @@ func (cm controllerMixins[T]) Create(context *gin.Context) {
 		return
 	}
 
+	service, ok := cm.serviceFn(ss).(operations.Creator[T])
+	if !ok {
+		rb.NotImplemented()
+		return
+	}
+
 	var model T
 	if err = context.ShouldBindJSON(&model); err != nil {
 		rb.ClientError(err)
 		return
 	}
 
-	err = cm.serviceFn(ss).Create(model)
+	responseModel, err := service.Create(model)
 	if err != nil {
 		cm.onError(rb, err)
 	} else {
-		rb.EmptyOk()
+		rb.Ok(responseModel)
 	}
 }
 
@@ -74,13 +94,19 @@ func (cm controllerMixins[T]) Update(context *gin.Context) {
 		return
 	}
 
+	service, ok := cm.serviceFn(ss).(operations.Updater[T])
+	if !ok {
+		rb.NotImplemented()
+		return
+	}
+
 	var model T
 	if err = context.ShouldBindJSON(&model); err != nil {
 		rb.ClientError(err)
 		return
 	}
 
-	updatedEntity, err := cm.serviceFn(ss).Update(model)
+	updatedEntity, err := service.Update(model)
 	if err != nil {
 		cm.onError(rb, err)
 	} else {
@@ -94,7 +120,13 @@ func (cm controllerMixins[T]) Delete(context *gin.Context) {
 		return
 	}
 
-	err = cm.serviceFn(ss).Delete(models.Id(context.Param("id")))
+	service, ok := cm.serviceFn(ss).(operations.Deleter)
+	if !ok {
+		rb.NotImplemented()
+		return
+	}
+
+	err = service.Delete(models.Id(context.Param("id")))
 	if err != nil {
 		cm.onError(rb, err)
 	} else {

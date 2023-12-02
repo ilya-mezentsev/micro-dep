@@ -23,7 +23,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			name: "ok",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().Create(mock.Anything).Return(nil)
+				m.EXPECT().Create(mock.Anything).Return(shared.Entity{}, nil)
 				m.EXPECT().Exists(mock.Anything).Return(false, nil)
 
 				return m
@@ -57,7 +57,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			name: "failed creation due to repo.Create error",
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
-				m.EXPECT().Create(mock.Anything).Return(sharedMocks.SomeError)
+				m.EXPECT().Create(mock.Anything).Return(shared.Entity{}, sharedMocks.SomeError)
 				m.EXPECT().Exists(mock.Anything).Return(false, nil)
 
 				return m
@@ -69,8 +69,9 @@ func TestServiceImpl_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewServiceImpl(tt.mockConstructor())
+			_, err := s.Create(shared.Entity{})
 
-			require.Equal(t, tt.expected, s.Create(shared.Entity{}))
+			require.Equal(t, tt.expected, err)
 		})
 	}
 }

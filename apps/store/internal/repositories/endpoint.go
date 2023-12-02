@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/frankenbeanies/uuid4"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
@@ -37,10 +38,12 @@ func newEndpoint(db *sqlx.DB, accountId models.Id) endpoint {
 	return endpoint{db: db, accountId: accountId}
 }
 
-func (e endpoint) Create(model shared.Endpoint) error {
+func (e endpoint) Create(model shared.Endpoint) (shared.Endpoint, error) {
+	model.Id = models.Id(uuid4.New().String())
+
 	_, err := e.db.NamedExec(addEndpointQuery, endpointProxy{}.fromEndpoint(model))
 
-	return err
+	return model, err
 }
 
 func (e endpoint) Update(model shared.Endpoint) (shared.Endpoint, error) {

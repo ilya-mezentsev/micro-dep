@@ -29,4 +29,7 @@ store-test:
 	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go test -cover ./internal/... | { grep -v "no test files"; true; }
 
 db-run:
-	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up db
+	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up -d db
+
+down:
+	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) down -v

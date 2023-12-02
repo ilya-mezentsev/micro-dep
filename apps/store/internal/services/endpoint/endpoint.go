@@ -16,26 +16,18 @@ func NewServiceImpl(repo Repo) ServiceImpl {
 	return ServiceImpl{repo: repo}
 }
 
-func (s ServiceImpl) ReadAll() ([]shared.Endpoint, error) {
-	panic("not implemented")
-}
-
-func (s ServiceImpl) ReadOne(id models.Id) (shared.Endpoint, error) {
-	panic("not implemented")
-}
-
-func (s ServiceImpl) Create(model shared.Endpoint) error {
+func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
 	entityExists, endpointExists, err := s.repo.Exists(model)
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = shared.NotFoundById
 		}
 
-		return err
+		return shared.Endpoint{}, err
 	} else if !entityExists {
-		return TryingToAddEndpointToMissingEntity
+		return shared.Endpoint{}, TryingToAddEndpointToMissingEntity
 	} else if endpointExists {
-		return TryingToCreateEndpointThatExists
+		return shared.Endpoint{}, TryingToCreateEndpointThatExists
 	}
 
 	return s.repo.Create(model)

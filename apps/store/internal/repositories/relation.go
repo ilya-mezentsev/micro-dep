@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/frankenbeanies/uuid4"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
@@ -39,10 +40,12 @@ func newRelation(db *sqlx.DB, accountId models.Id) relation {
 	return relation{db: db, accountId: accountId}
 }
 
-func (r relation) Create(model shared.Relation) error {
+func (r relation) Create(model shared.Relation) (shared.Relation, error) {
+	model.Id = models.Id(uuid4.New().String())
+
 	_, err := r.db.NamedExec(addRelationQuery, relationProxy{}.fromRelation(model))
 
-	return err
+	return model, err
 }
 
 func (r relation) ReadAll() ([]shared.Relation, error) {

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
-	"github.com/ilya-mezentsev/micro-dep/shared/types/operations"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services"
 	servicesShared "github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
@@ -15,7 +14,7 @@ func NewEntity(servicesFactory func(id models.Id) services.Services) Entity {
 	return Entity{
 		controllerMixins: controllerMixins[servicesShared.Entity]{
 			servicesFactory: servicesFactory,
-			serviceFn: func(ss services.Services) operations.CRUD[servicesShared.Entity] {
+			serviceFn: func(ss services.Services) any {
 				return ss.Entity()
 			},
 		},

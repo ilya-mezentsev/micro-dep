@@ -1,14 +1,17 @@
 package shared
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type (
 	ResponseBuilder interface {
 		EmptyOk()
+		Created()
 		Ok(response any)
+		NotImplemented()
 		InternalError(err error)
 		ClientError(err error)
 		ConflictError(err error)
@@ -39,6 +42,10 @@ func (r responseBuilder) InternalError(err error) {
 	r.context.JSON(http.StatusInternalServerError, errorResponse{Error: err.Error()})
 }
 
+func (r responseBuilder) NotImplemented() {
+	r.context.Status(http.StatusNotImplemented)
+}
+
 func (r responseBuilder) NotFoundError(err error) {
 	r.context.JSON(http.StatusNotFound, errorResponse{Error: err.Error()})
 }
@@ -53,6 +60,10 @@ func (r responseBuilder) ConflictError(err error) {
 
 func (r responseBuilder) Ok(response any) {
 	r.context.JSON(http.StatusOK, okResponse{Data: response})
+}
+
+func (r responseBuilder) Created() {
+	r.context.Status(http.StatusCreated)
 }
 
 func (r responseBuilder) EmptyOk() {

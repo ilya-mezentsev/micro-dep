@@ -1,2 +1,0 @@
-GET localhost:8080/api/entities
-Cookie: X-Auth-Token=f93676f8f379c74cefc0d9959d843ac0

@@ -17,7 +17,7 @@ const (
 	entityQuery            = `SELECT id, account_id, author_id, name, description FROM entity WHERE account_id = $1 AND id = $2`
 	entitiesQuery          = `SELECT id, account_id, author_id, name, description FROM entity WHERE account_id = $1`
 	entitiesEndpointsQuery = `SELECT * FROM entity_endpoint WHERE entity_id = ANY($1)`
-	endpointsInUseQuery    = `SELECT * FROM entity_endpoint ep WHERE entity_id = ANY($1) AND EXISTS(SELECT 1 FROM dependency WHERE to_id = ep.id)`
+	endpointsInUseQuery    = `SELECT * FROM entity_endpoint ep WHERE entity_id = $1 AND EXISTS(SELECT 1 FROM dependency WHERE to_id = ep.id)`
 
 	addEntityQuery   = `INSERT INTO entity(account_id, author_id, name, description) VALUES (:account_id, :author_id, :name, :description)`
 	addEndpointQuery = `INSERT INTO entity_endpoint(entity_id, kind, address) VALUES(:entity_id, :kind, :address)`
@@ -47,10 +47,10 @@ func newEntity(db *sqlx.DB, accountId models.Id) entity {
 	return entity{db: db, accountId: accountId}
 }
 
-func (e entity) Create(model shared.Entity) error {
+func (e entity) Create(model shared.Entity) (shared.Entity, error) {
 	tx, err := e.db.Beginx()
 	if err != nil {
-		return err
+		return shared.Entity{}, err
 	}
 	//goland:noinspection ALL
 	defer tx.Rollback()
@@ -59,18 +59,18 @@ func (e entity) Create(model shared.Entity) error {
 
 	_, err = tx.NamedExec(addEntityQuery, entityProxy{AccountId: string(e.accountId)}.fromEntity(model))
 	if err != nil {
-		return err
+		return shared.Entity{}, err
 	}
 
 	for _, endpointModel := range model.Endpoints {
 		endpointModel.EntityId = model.Id
 		_, err = tx.NamedExec(addEndpointQuery, endpointProxy{}.fromEndpoint(endpointModel))
 		if err != nil {
-			return err
+			return shared.Entity{}, err
 		}
 	}
 
-	return tx.Commit()
+	return model, tx.Commit()
 }
 
 func (e entity) ReadAll() ([]shared.Entity, error) {
