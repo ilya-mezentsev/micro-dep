@@ -21,7 +21,7 @@ func (s ServiceImpl) Create(model shared.Entity) error {
 	if err != nil {
 		return err
 	} else if exists {
-		return shared.ExistsError
+		return shared.AlreadyExists
 	}
 
 	return s.repo.Create(model)

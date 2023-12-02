@@ -2,14 +2,13 @@ package web
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ilya-mezentsev/micro-dep/shared/transport/middleware"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/configs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services"
+	"github.com/ilya-mezentsev/micro-dep/store/internal/transport/web/controllers"
 )
 
 type Response struct {
@@ -30,22 +29,26 @@ func Start(
 
 	apiGroup.Use(cookieAuthMiddleware)
 
-	apiGroup.GET("/entities", func(context *gin.Context) {
-		accountId, exists := context.Get(middleware.AccountIdKey)
-		if !exists {
-			context.JSON(http.StatusInternalServerError, Response{Message: "internal error"})
-			return
-		}
+	entityController := controllers.NewEntity(servicesFactory)
+	apiGroup.GET("/entities", entityController.ReadAll)
+	apiGroup.GET("/entity/:id", entityController.ReadOne)
+	apiGroup.POST("/entity", entityController.Create)
+	apiGroup.PUT("/entity", entityController.Update)
+	apiGroup.DELETE("/entity/:id", entityController.Delete)
 
-		accountServices := servicesFactory(accountId.(models.Id))
-		entities, err := accountServices.Entity().ReadAll()
-		if err != nil {
-			context.JSON(http.StatusInternalServerError, Response{Message: err.Error()})
-		} else {
-			context.JSON(http.StatusOK, entities)
-		}
-	})
+	endpointController := controllers.NewEndpoint(servicesFactory)
+	apiGroup.POST("/endpoint", endpointController.Create)
+	apiGroup.PUT("/endpoint", endpointController.Update)
+	apiGroup.DELETE("/endpoint/:id", endpointController.Delete)
+
+	relationController := controllers.NewRelation(servicesFactory)
+	apiGroup.GET("/relation", relationController.ReadAll)
+	apiGroup.POST("/relation", relationController.Create)
+	apiGroup.DELETE("/relation/:id", relationController.Delete)
 
 	fmt.Printf("Listening port %d\n", webSettings.Port)
-	r.Run(fmt.Sprintf("%s:%d", webSettings.Domain, webSettings.Port))
+	err := r.Run(fmt.Sprintf("%s:%d", webSettings.Domain, webSettings.Port))
+	if err != nil {
+		panic(err)
+	}
 }

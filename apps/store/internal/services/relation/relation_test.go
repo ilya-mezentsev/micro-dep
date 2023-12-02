@@ -147,12 +147,19 @@ func TestServiceImpl_ReadAll(t *testing.T) {
 }
 
 func TestServiceImpl_ReadOne(t *testing.T) {
-	// just check panic
 	defer func() {
 		require.NotNil(t, recover())
 	}()
 
 	NewServiceImpl(relationMocks.NewMockRepo(t)).ReadOne(sharedMocks.Relations[0].Id)
+}
+
+func TestServiceImpl_Update(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+
+	NewServiceImpl(relationMocks.NewMockRepo(t)).Update(sharedMocks.Relations[0])
 }
 
 func TestServiceImpl_Delete(t *testing.T) {

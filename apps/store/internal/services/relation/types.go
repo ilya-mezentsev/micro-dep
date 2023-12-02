@@ -5,7 +5,7 @@ import (
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
 
-type Service = operations.CRD[shared.Relation]
+type Service = operations.CRUD[shared.Relation]
 
 type Repo interface {
 	operations.CRD[shared.Relation]

@@ -50,7 +50,7 @@ func TestServiceImpl_Create(t *testing.T) {
 
 				return m
 			},
-			expected: shared.ExistsError,
+			expected: shared.AlreadyExists,
 		},
 
 		{

@@ -268,3 +268,19 @@ func TestServiceImpl_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestServiceImpl_ReadAll(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+
+	_, _ = NewServiceImpl(nil).ReadAll()
+}
+
+func TestServiceImpl_ReadOne(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+
+	_, _ = NewServiceImpl(nil).ReadOne("")
+}

@@ -6,7 +6,7 @@ import (
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
 
-type Service = operations.CUD[shared.Endpoint]
+type Service = operations.CRUD[shared.Endpoint]
 
 type Repo interface {
 	operations.CUD[shared.Endpoint]

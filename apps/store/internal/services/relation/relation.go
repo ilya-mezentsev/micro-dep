@@ -41,6 +41,10 @@ func (s ServiceImpl) ReadOne(_ models.Id) (shared.Relation, error) {
 	panic("not implemented")
 }
 
+func (s ServiceImpl) Update(_ shared.Relation) (shared.Relation, error) {
+	panic("not implemented")
+}
+
 func (s ServiceImpl) Delete(id models.Id) error {
 	return s.repo.Delete(id)
 }
