@@ -19,8 +19,8 @@ const (
 	entitiesEndpointsQuery = `SELECT * FROM entity_endpoint WHERE entity_id = ANY($1)`
 	endpointsInUseQuery    = `SELECT * FROM entity_endpoint ep WHERE entity_id = $1 AND EXISTS(SELECT 1 FROM dependency WHERE to_id = ep.id)`
 
-	addEntityQuery   = `INSERT INTO entity(account_id, author_id, name, description) VALUES (:account_id, :author_id, :name, :description)`
-	addEndpointQuery = `INSERT INTO entity_endpoint(entity_id, kind, address) VALUES(:entity_id, :kind, :address)`
+	addEntityQuery   = `INSERT INTO entity(id, account_id, author_id, name, description) VALUES (:id, :account_id, :author_id, :name, :description)`
+	addEndpointQuery = `INSERT INTO entity_endpoint(id, entity_id, kind, address) VALUES(:id, :entity_id, :kind, :address)`
 
 	updateEntityQuery = `UPDATE entity SET description = $2 WHERE id = $1`
 	deleteEntityQuery = `DELETE FROM entity WHERE id = $1`
@@ -62,9 +62,10 @@ func (e entity) Create(model shared.Entity) (shared.Entity, error) {
 		return shared.Entity{}, err
 	}
 
-	for _, endpointModel := range model.Endpoints {
-		endpointModel.EntityId = model.Id
-		_, err = tx.NamedExec(addEndpointQuery, endpointProxy{}.fromEndpoint(endpointModel))
+	for i := range model.Endpoints {
+		model.Endpoints[i].Id = models.Id(uuid4.New().String())
+		model.Endpoints[i].EntityId = model.Id
+		_, err = tx.NamedExec(addEndpointQuery, endpointProxy{}.fromEndpoint(model.Endpoints[i]))
 		if err != nil {
 			return shared.Entity{}, err
 		}
@@ -145,9 +146,26 @@ func (e entity) ReadOne(id models.Id) (shared.Entity, error) {
 }
 
 func (e entity) Update(model shared.Entity) (shared.Entity, error) {
-	_, err := e.db.Exec(updateEntityQuery, string(e.accountId), string(model.Id))
+	tx, err := e.db.Beginx()
+	if err != nil {
+		return shared.Entity{}, err
+	}
+	//goland:noinspection ALL
+	defer tx.Rollback()
 
-	return model, err
+	_, err = tx.Exec(updateEntityQuery, string(model.Id), model.Description)
+	if err != nil {
+		return shared.Entity{}, err
+	}
+
+	for _, endpointModel := range model.Endpoints {
+		_, err = tx.NamedExec(updateEndpointQuery, endpointProxy{}.fromEndpoint(endpointModel))
+		if err != nil {
+			return shared.Entity{}, err
+		}
+	}
+
+	return model, tx.Commit()
 }
 
 func (e entity) Delete(id models.Id) error {

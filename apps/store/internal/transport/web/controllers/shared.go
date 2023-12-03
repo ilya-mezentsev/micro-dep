@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/transport/middleware"

@@ -19,8 +19,8 @@ type (
 	}
 
 	Relation struct {
-		Id           models.Id
-		FromEntityId models.Id
-		ToEndpointId models.Id
+		Id           models.Id `json:"id"`
+		FromEntityId models.Id `json:"from_entity_id"`
+		ToEndpointId models.Id `json:"to_endpoint_id"`
 	}
 )

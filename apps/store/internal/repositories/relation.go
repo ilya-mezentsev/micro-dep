@@ -19,7 +19,7 @@ const (
 	INNER JOIN entity e ON d.from_id = e.id
 	WHERE e.account_id = $1`
 
-	addRelationQuery    = `INSERT INTO dependency(from_id, to_id) VALUES(:from_id. :to_id)`
+	addRelationQuery    = `INSERT INTO dependency(id, from_id, to_id) VALUES(:id, :from_id, :to_id)`
 	deleteRelationQuery = `DELETE FROM dependency WHERE id = $1`
 )
 
