@@ -3,6 +3,7 @@ package endpoint
 import (
 	"testing"
 
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
@@ -25,7 +26,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
 				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(shared.Endpoint{}, nil)
+				m.EXPECT().Create(mock.Anything).Return(shared.Endpoint{}, nil)
 
 				return m
 			},
@@ -86,7 +87,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
 				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(sharedMocks.Endpoints[0]).Return(shared.Endpoint{}, sharedMocks.SomeError)
+				m.EXPECT().Create(mock.Anything).Return(shared.Endpoint{}, sharedMocks.SomeError)
 
 				return m
 			},

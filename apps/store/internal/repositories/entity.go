@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/frankenbeanies/uuid4"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 
@@ -55,16 +54,12 @@ func (e entity) Create(model shared.Entity) (shared.Entity, error) {
 	//goland:noinspection ALL
 	defer tx.Rollback()
 
-	model.Id = models.Id(uuid4.New().String())
-
 	_, err = tx.NamedExec(addEntityQuery, entityProxy{AccountId: string(e.accountId)}.fromEntity(model))
 	if err != nil {
 		return shared.Entity{}, err
 	}
 
 	for i := range model.Endpoints {
-		model.Endpoints[i].Id = models.Id(uuid4.New().String())
-		model.Endpoints[i].EntityId = model.Id
 		_, err = tx.NamedExec(addEndpointQuery, endpointProxy{}.fromEndpoint(model.Endpoints[i]))
 		if err != nil {
 			return shared.Entity{}, err

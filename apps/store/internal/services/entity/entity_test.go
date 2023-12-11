@@ -69,7 +69,7 @@ func TestServiceImpl_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewServiceImpl(tt.mockConstructor())
-			_, err := s.Create(shared.Entity{})
+			_, err := s.Create(sharedMocks.Entities[0])
 
 			require.Equal(t, tt.expected, err)
 		})

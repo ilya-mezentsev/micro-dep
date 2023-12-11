@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/frankenbeanies/uuid4"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
@@ -41,8 +40,6 @@ func newRelation(db *sqlx.DB, accountId models.Id) relation {
 }
 
 func (r relation) Create(model shared.Relation) (shared.Relation, error) {
-	model.Id = models.Id(uuid4.New().String())
-
 	_, err := r.db.NamedExec(addRelationQuery, relationProxy{}.fromRelation(model))
 
 	return model, err

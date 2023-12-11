@@ -3,6 +3,8 @@ package entity
 import (
 	"errors"
 
+	"github.com/frankenbeanies/uuid4"
+
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
@@ -22,6 +24,12 @@ func (s ServiceImpl) Create(model shared.Entity) (shared.Entity, error) {
 		return shared.Entity{}, err
 	} else if exists {
 		return shared.Entity{}, shared.AlreadyExists
+	}
+
+	model.Id = models.Id(uuid4.New().String())
+	for i := range model.Endpoints {
+		model.Endpoints[i].EntityId = model.Id
+		model.Endpoints[i].Id = models.Id(uuid4.New().String())
 	}
 
 	return s.repo.Create(model)

@@ -3,6 +3,8 @@ package relation
 import (
 	"errors"
 
+	"github.com/frankenbeanies/uuid4"
+
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
@@ -29,6 +31,8 @@ func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
 	} else if !endpointExists {
 		return shared.Relation{}, TryingToCreateRelationToMissedEndpoint
 	}
+
+	model.Id = models.Id(uuid4.New().String())
 
 	return s.repo.Create(model)
 }

@@ -3,6 +3,7 @@ package relation
 import (
 	"testing"
 
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
@@ -25,7 +26,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := relationMocks.NewMockRepo(t)
 				m.EXPECT().PartsExist(sharedMocks.Relations[0]).Return(true, true, nil)
-				m.EXPECT().Create(sharedMocks.Relations[0]).Return(sharedMocks.Relations[0], nil)
+				m.EXPECT().Create(mock.Anything).Return(sharedMocks.Relations[0], nil)
 
 				return m
 			},
@@ -86,7 +87,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := relationMocks.NewMockRepo(t)
 				m.EXPECT().PartsExist(sharedMocks.Relations[0]).Return(true, true, nil)
-				m.EXPECT().Create(sharedMocks.Relations[0]).Return(shared.Relation{}, sharedMocks.SomeError)
+				m.EXPECT().Create(mock.Anything).Return(shared.Relation{}, sharedMocks.SomeError)
 
 				return m
 			},
