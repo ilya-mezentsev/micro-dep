@@ -11,18 +11,18 @@ import (
 var AccountNotFoundErr = errors.New("account-not-found")
 
 type Service struct {
-	tokenRepo TokenRepo
+	tokenRepo TokenReaderRepo
 }
 
-func NewService(tokenRepo TokenRepo) Service {
+func NewService(tokenRepo TokenReaderRepo) Service {
 	return Service{tokenRepo: tokenRepo}
 }
 
 func (s Service) IsAuthenticated(value string) (models.Id, error) {
-	accountId, err := s.tokenRepo.AuthorizedAccountId(value, time.Now())
+	ids, err := s.tokenRepo.AuthorizedAccountId(value, time.Now())
 	if errors.Is(err, errs.IdMissingInStorage) {
 		err = AccountNotFoundErr
 	}
 
-	return accountId, err
+	return ids.AccountId, err
 }

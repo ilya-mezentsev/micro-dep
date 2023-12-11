@@ -14,9 +14,11 @@ DOCKER_COMPOSE_ENTRYPOINT := $(ROOT_DIR)/docker-compose.yaml
 
 ENTRYPOINT := cmd/main.go
 
-mocks: store-mocks
+mocks: store-mocks user-mocks
 
-test: store-test
+test: store-test user-test
+
+tidy: store-tidy user-tidy
 
 test-all: test e2e-test
 
@@ -33,6 +35,15 @@ e2e-setup: e2e-venv e2e-req
 
 user-run:
 	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go run $(ENTRYPOINT)
+
+user-tidy:
+	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go mod tidy
+
+user-mocks:
+	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) mockery
+
+user-test:
+	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go test -cover ./internal/... | { grep -v "no test files"; true; }
 
 store-run:
 	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
