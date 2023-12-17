@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	noTokenInCookie = errors.New("no-token-in-cookie")
+	NoTokenInCookie = errors.New("no-token-in-cookie")
 	invalidToken    = errors.New("invalid-token")
 )
 
@@ -26,7 +26,7 @@ func (a Auth) ByCookie() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie(CookieName)
 		if err != nil {
-			_ = c.AbortWithError(http.StatusUnauthorized, noTokenInCookie)
+			_ = c.AbortWithError(http.StatusUnauthorized, NoTokenInCookie)
 			return
 		}
 

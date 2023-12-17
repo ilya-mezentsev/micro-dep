@@ -11,10 +11,6 @@ import (
 	"github.com/ilya-mezentsev/micro-dep/store/internal/transport/web/controllers"
 )
 
-type Response struct {
-	Message string `json:"message"`
-}
-
 func Start(
 	webSettings configs.Web,
 	servicesFactory func(id models.Id) services.Services,
@@ -25,7 +21,7 @@ func Start(
 
 	r.Use(gin.Recovery())
 
-	apiGroup := r.Group("/api")
+	apiGroup := r.Group("/api/dependencies")
 
 	apiGroup.Use(cookieAuthMiddleware)
 

@@ -60,9 +60,9 @@ INSERT INTO account(id, registered_at) VALUES
    ('32f157cc-23bc-4bc4-a40c-ad9384406809', 1699191471);
 
 -- author for each account; passwords == md5(username)
-INSERT INTO author(account_id, username, password, registered_at, permissions_kind) VALUES
-    ('c5d6f777-8195-4908-af7d-6e3c1cd2460e', 'foo', 'acbd18db4cc2f85cedef654fccc4a4d8', 1699191331, 'admin'),
-    ('32f157cc-23bc-4bc4-a40c-ad9384406809', 'bar', '37b51d194a7513e45b56f6524f2d51f2', 1699191471, 'admin');
+INSERT INTO author(id, account_id, username, password, registered_at, permissions_kind) VALUES
+    ('4a7b8037-2cba-4667-bf1b-a2d227c7b80b', 'c5d6f777-8195-4908-af7d-6e3c1cd2460e', 'foo', 'acbd18db4cc2f85cedef654fccc4a4d8', 1699191331, 'admin'),
+    ('c332c855-6b4c-4582-97f2-5ad196ff436c', '32f157cc-23bc-4bc4-a40c-ad9384406809', 'bar', '37b51d194a7513e45b56f6524f2d51f2', 1699191471, 'admin');
 
 INSERT INTO auth_token(author_id, value, created_at, expired_at) VALUES
     (

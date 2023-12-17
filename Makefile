@@ -34,7 +34,7 @@ e2e-req:
 e2e-setup: e2e-venv e2e-req
 
 user-run:
-	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go run $(ENTRYPOINT)
+	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
 
 user-tidy:
 	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go mod tidy

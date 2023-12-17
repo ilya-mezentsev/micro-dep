@@ -8,7 +8,7 @@ import (
 
 type (
 	AuthorRepo interface {
-		ById(authorIds models.Id) (shared.Author, error)
+		ById(authorId models.Id) (shared.Author, error)
 		ByCredentials(creds shared.AuthorCreds) (shared.Author, error)
 	}
 

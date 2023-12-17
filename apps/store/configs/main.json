@@ -2,7 +2,8 @@
   "web": {
     "port": 8080,
     "domain": "localhost",
-    "secure_cookie": false
+    "secure_cookie": false,
+    "http_only": true
   },
   "db": {
     "host": "localhost",

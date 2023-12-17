@@ -35,6 +35,7 @@ func (s Service) AuthorizedByToken(value string) (shared.Author, error) {
 		return shared.Author{}, err
 	}
 
+	// if we have authorized account here we cannot get missing-id error
 	return s.authorRepo.ById(ids.AuthorId)
 }
 

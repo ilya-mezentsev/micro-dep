@@ -14,6 +14,7 @@ type (
 		NotImplemented()
 		InternalError(err error)
 		ClientError(err error)
+		UnauthorizedError(err error)
 		ConflictError(err error)
 		NotFoundError(err error)
 	}
@@ -52,6 +53,10 @@ func (r responseBuilder) NotFoundError(err error) {
 
 func (r responseBuilder) ClientError(err error) {
 	r.context.JSON(http.StatusBadRequest, errorResponse{Error: err.Error()})
+}
+
+func (r responseBuilder) UnauthorizedError(err error) {
+	r.context.JSON(http.StatusUnauthorized, errorResponse{Error: err.Error()})
 }
 
 func (r responseBuilder) ConflictError(err error) {
