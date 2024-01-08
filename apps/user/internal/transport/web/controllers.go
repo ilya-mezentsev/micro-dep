@@ -26,6 +26,11 @@ func Start(
 	apiGroup.POST("/session", sessionController.Post)
 	apiGroup.DELETE("/session", sessionController.Delete)
 
+	registerController := controllers.NewRegister(services.Register())
+	apiGroup.POST("/account", registerController.Register)
+	apiGroup.GET("/account/:id", registerController.AccountExists)
+	apiGroup.POST("/account/:id", registerController.RegisterForAccount)
+
 	fmt.Printf("Listening port %d\n", webSettings.Port)
 	err := r.Run(fmt.Sprintf("%s:%d", webSettings.Domain, webSettings.Port))
 	if err != nil {

@@ -3,6 +3,11 @@ package shared
 import "github.com/ilya-mezentsev/micro-dep/shared/types/models"
 
 type (
+	Account struct {
+		Id           models.Id
+		RegisteredAt int64
+	}
+
 	Author struct {
 		Id           models.Id `json:"id"`
 		AccountId    models.Id `json:"account_id"`

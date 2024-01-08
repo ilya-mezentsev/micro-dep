@@ -14,6 +14,8 @@ import (
 const (
 	findAuthorByIdQuery    = `SELECT id, account_id, username, registered_at FROM author WHERE id = $1`
 	findAuthorByCredsQuery = `SELECT id, account_id, username, registered_at FROM author WHERE username = $1 AND password = $2`
+	createAuthorQuery      = `INSERT INTO author VALUES(:id, :account_id, :username, :password, :registered_at)`
+	usernameExistsQuery    = `SELECT EXISTS(SELECT 1 FROM author WHERE username = $1)`
 )
 
 type (
@@ -31,6 +33,19 @@ type (
 
 func newAuthor(db *sqlx.DB) Author {
 	return Author{db: db}
+}
+
+func (a Author) Create(author shared.Author, password string) error {
+	_, err := a.db.NamedExec(createAuthorQuery, authorProxy{}.mapFromModelAndPassword(author, password))
+
+	return err
+}
+
+func (a Author) UsernameExists(username string) (bool, error) {
+	var result bool
+	err := a.db.Get(&result, usernameExistsQuery, username)
+
+	return result, err
 }
 
 func (a Author) ById(authorId models.Id) (shared.Author, error) {
@@ -59,5 +74,15 @@ func (ap authorProxy) toModel() shared.Author {
 		AccountId:    models.Id(ap.AccountId),
 		Username:     ap.Username,
 		RegisteredAt: ap.RegisteredAt,
+	}
+}
+
+func (ap authorProxy) mapFromModelAndPassword(author shared.Author, password string) map[string]interface{} {
+	return map[string]interface{}{
+		"id":            string(author.Id),
+		"account_id":    string(author.AccountId),
+		"username":      author.Username,
+		"password":      password,
+		"registered_at": author.RegisteredAt,
 	}
 }

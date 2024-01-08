@@ -17,6 +17,7 @@ type (
 		UnauthorizedError(err error)
 		ConflictError(err error)
 		NotFoundError(err error)
+		EmptyNotFound()
 	}
 
 	responseBuilder struct {
@@ -49,6 +50,10 @@ func (r responseBuilder) NotImplemented() {
 
 func (r responseBuilder) NotFoundError(err error) {
 	r.context.JSON(http.StatusNotFound, errorResponse{Error: err.Error()})
+}
+
+func (r responseBuilder) EmptyNotFound() {
+	r.context.AbortWithStatus(http.StatusNotFound)
 }
 
 func (r responseBuilder) ClientError(err error) {

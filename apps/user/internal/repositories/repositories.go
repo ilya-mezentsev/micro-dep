@@ -3,22 +3,36 @@ package repositories
 import (
 	"github.com/jmoiron/sqlx"
 
+	"github.com/ilya-mezentsev/micro-dep/user/internal/services/register"
 	"github.com/ilya-mezentsev/micro-dep/user/internal/services/session"
 )
 
-type Repositories struct {
-	author session.AuthorRepo
-	token  session.TokenRepo
-}
+type (
+	AuthorRepo interface {
+		register.AuthorRepo
+		session.AuthorRepo
+	}
+
+	Repositories struct {
+		account register.AccountRepo
+		author  AuthorRepo
+		token   session.TokenRepo
+	}
+)
 
 func New(db *sqlx.DB) Repositories {
 	return Repositories{
-		author: newAuthor(db),
-		token:  newToken(db),
+		account: newAccount(db),
+		author:  newAuthor(db),
+		token:   newToken(db),
 	}
 }
 
-func (r Repositories) Author() session.AuthorRepo {
+func (r Repositories) Account() register.AccountRepo {
+	return r.account
+}
+
+func (r Repositories) Author() AuthorRepo {
 	return r.author
 }
 

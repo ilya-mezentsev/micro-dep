@@ -8,3 +8,8 @@ packages:
         interfaces:
             AuthorRepo:
             TokenRepo:
+
+    github.com/ilya-mezentsev/micro-dep/user/internal/services/register:
+        interfaces:
+            AccountRepo:
+            AuthorRepo:
