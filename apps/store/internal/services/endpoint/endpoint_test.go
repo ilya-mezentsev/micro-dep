@@ -1,6 +1,8 @@
 package endpoint
 
 import (
+	"io"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -54,7 +56,7 @@ func TestServiceImpl_Create(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 
 		{
@@ -91,13 +93,13 @@ func TestServiceImpl_Create(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			_, err := s.Create(tt.model)
 
 			require.Equal(t, tt.expected, err)
@@ -150,7 +152,7 @@ func TestServiceImpl_Update(t *testing.T) {
 				return m
 			},
 			expectedModel: shared.Endpoint{},
-			expectedError: sharedMocks.SomeError,
+			expectedError: errs.Unknown,
 		},
 
 		{
@@ -177,13 +179,13 @@ func TestServiceImpl_Update(t *testing.T) {
 				return m
 			},
 			expectedModel: shared.Endpoint{},
-			expectedError: sharedMocks.SomeError,
+			expectedError: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			model, err := s.Update(tt.model)
 
 			require.Equal(t, tt.expectedModel, model)
@@ -233,7 +235,7 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 
 		{
@@ -258,13 +260,13 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			require.Equal(t, tt.expected, s.Delete(tt.modelId))
 		})

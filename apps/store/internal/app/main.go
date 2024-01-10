@@ -1,6 +1,7 @@
 package app
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/repositories"
@@ -20,10 +21,16 @@ type Config struct {
 func Main() {
 	settings := config.MustParse[Config](os.Getenv("CONFIG_PATH"))
 	db := connection.MustGetConnection(settings.DB)
-	servicesFactory := NewServicesFactory(db)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	servicesFactory := NewServicesFactory(db, logger)
 
-	authService := auth.NewService(repositories.NewAuthToken(db))
+	authService := auth.NewService(repositories.NewAuthToken(db), logger)
 	authMiddleware := middleware.NewAuth(authService)
 
-	web.Start(settings.Web, servicesFactory.Services, authMiddleware.ByCookie())
+	web.Start(
+		settings.Web,
+		servicesFactory.Services,
+		authMiddleware.ByCookie(),
+		logger,
+	)
 }

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/services/config"
@@ -20,7 +21,13 @@ func Main() {
 	settings := config.MustParse[Config](os.Getenv("CONFIG_PATH"))
 	db := connection.MustGetConnection(settings.DB)
 	repos := repositories.New(db)
-	ss := services.New(repos)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	web.Start(settings.Web, ss)
+	ss := services.New(repos, logger)
+
+	web.Start(
+		settings.Web,
+		ss,
+		logger,
+	)
 }

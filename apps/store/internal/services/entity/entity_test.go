@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"io"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -39,7 +41,7 @@ func TestServiceImpl_Create(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 
 		{
@@ -62,13 +64,13 @@ func TestServiceImpl_Create(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			_, err := s.Create(sharedMocks.Entities[0])
 
 			require.Equal(t, tt.expected, err)
@@ -104,13 +106,13 @@ func TestServiceImpl_ReadAll(t *testing.T) {
 				return m
 			},
 			expectedDTOs: nil,
-			expectedErr:  sharedMocks.SomeError,
+			expectedErr:  errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			dtos, err := s.ReadAll()
 
 			require.Equal(t, tt.expectedDTOs, dtos)
@@ -163,13 +165,13 @@ func TestServiceImpl_ReadOne(t *testing.T) {
 			},
 			entityId:    sharedMocks.Entities[0].Id,
 			expectedDTO: shared.Entity{},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			dtos, err := s.ReadOne(tt.entityId)
 
 			require.Equal(t, tt.expectedDTO, dtos)
@@ -214,7 +216,7 @@ func TestServiceImpl_Update(t *testing.T) {
 		},
 
 		{
-			name:        "general error",
+			name:        "FetchRelations general error",
 			entityModel: sharedMocks.Entities[0],
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
@@ -223,7 +225,21 @@ func TestServiceImpl_Update(t *testing.T) {
 				return m
 			},
 			expectedDTO: shared.Entity{},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
+		},
+
+		{
+			name:        "update error",
+			entityModel: sharedMocks.Entities[0],
+			mockConstructor: func() Repo {
+				m := entityMocks.NewMockRepo(t)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(sharedMocks.Endpoints[:2], nil)
+				m.EXPECT().Update(sharedMocks.Entities[0]).Return(shared.Entity{}, sharedMocks.SomeError)
+
+				return m
+			},
+			expectedDTO: shared.Entity{},
+			expectedErr: errs.Unknown,
 		},
 
 		{
@@ -242,7 +258,7 @@ func TestServiceImpl_Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			dtos, err := s.Update(tt.entityModel)
 
 			require.Equal(t, tt.expectedDTO, dtos)
@@ -284,7 +300,7 @@ func TestServiceImpl_Delete(t *testing.T) {
 		},
 
 		{
-			name:     "general error",
+			name:     "FetchRelations general error",
 			entityId: sharedMocks.Entities[0].Id,
 			mockConstructor: func() Repo {
 				m := entityMocks.NewMockRepo(t)
@@ -292,7 +308,20 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 				return m
 			},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
+		},
+
+		{
+			name:     "delete error",
+			entityId: sharedMocks.Entities[0].Id,
+			mockConstructor: func() Repo {
+				m := entityMocks.NewMockRepo(t)
+				m.EXPECT().FetchRelations(sharedMocks.Entities[0].Id).Return(nil, nil)
+				m.EXPECT().Delete(sharedMocks.Entities[0].Id).Return(sharedMocks.SomeError)
+
+				return m
+			},
+			expectedErr: errs.Unknown,
 		},
 
 		{
@@ -310,7 +339,7 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			require.Equal(t, tt.expectedErr, s.Delete(tt.entityId))
 		})

@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/frankenbeanies/uuid4"
 
@@ -11,11 +12,15 @@ import (
 )
 
 type ServiceImpl struct {
-	repo Repo
+	repo   Repo
+	logger *slog.Logger
 }
 
-func NewServiceImpl(repo Repo) ServiceImpl {
-	return ServiceImpl{repo: repo}
+func NewServiceImpl(repo Repo, logger *slog.Logger) ServiceImpl {
+	return ServiceImpl{
+		repo:   repo,
+		logger: logger,
+	}
 }
 
 func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
@@ -23,6 +28,14 @@ func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = shared.NotFoundById
+		} else {
+			s.logger.Error(
+				"Got an error while checking endpoint entity existence",
+				slog.Any("err", err),
+				slog.String("entity-id", string(model.EntityId)),
+			)
+
+			err = errs.Unknown
 		}
 
 		return shared.Endpoint{}, err
@@ -33,8 +46,18 @@ func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
 	}
 
 	model.Id = models.Id(uuid4.New().String())
+	endpoint, err := s.repo.Create(model)
+	if err != nil {
+		s.logger.Error(
+			"Got an error while creating endpoint",
+			slog.Any("err", err),
+			slog.String("entity-id", string(model.EntityId)),
+		)
 
-	return s.repo.Create(model)
+		err = errs.Unknown
+	}
+
+	return endpoint, err
 }
 
 func (s ServiceImpl) Update(model shared.Endpoint) (shared.Endpoint, error) {
@@ -42,6 +65,14 @@ func (s ServiceImpl) Update(model shared.Endpoint) (shared.Endpoint, error) {
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = shared.NotFoundById
+		} else {
+			s.logger.Error(
+				"Got an error while checking endpoint entity existence",
+				slog.Any("err", err),
+				slog.String("entity-id", string(model.EntityId)),
+			)
+
+			err = errs.Unknown
 		}
 
 		return shared.Endpoint{}, err
@@ -49,7 +80,19 @@ func (s ServiceImpl) Update(model shared.Endpoint) (shared.Endpoint, error) {
 		return shared.Endpoint{}, TryingToUpdateMissingEndpoint
 	}
 
-	return s.repo.Update(model)
+	endpoint, err := s.repo.Update(model)
+	if err != nil {
+		s.logger.Error(
+			"Got an error while updating endpoint",
+			slog.Any("err", err),
+			slog.String("entity-id", string(model.EntityId)),
+			slog.String("endpoint-id", string(model.Id)),
+		)
+
+		err = errs.Unknown
+	}
+
+	return endpoint, err
 }
 
 func (s ServiceImpl) Delete(id models.Id) error {
@@ -57,6 +100,14 @@ func (s ServiceImpl) Delete(id models.Id) error {
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = shared.NotFoundById
+		} else {
+			slog.Error(
+				"Got an error while checking endpoint relations",
+				slog.Any("err", err),
+				slog.String("endpoint-id", string(id)),
+			)
+
+			err = errs.Unknown
 		}
 
 		return err
@@ -64,5 +115,16 @@ func (s ServiceImpl) Delete(id models.Id) error {
 		return TryingToRemoveEndpointThatHasRelation
 	}
 
-	return s.repo.Delete(id)
+	err = s.repo.Delete(id)
+	if err != nil {
+		slog.Error(
+			"Got an error while deleting endpoint",
+			slog.Any("err", err),
+			slog.String("endpoint-id", string(id)),
+		)
+
+		err = errs.Unknown
+	}
+
+	return err
 }

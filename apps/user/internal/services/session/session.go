@@ -2,6 +2,7 @@ package session
 
 import (
 	"errors"
+	"log/slog"
 	"time"
 
 	"github.com/frankenbeanies/uuid4"
@@ -16,12 +17,19 @@ const sevenDays = 7 * 24 * 60 * 60
 type Service struct {
 	tokenRepo  TokenRepo
 	authorRepo AuthorRepo
+	logger     *slog.Logger
 }
 
-func New(tokenRepo TokenRepo, authorRepo AuthorRepo) Service {
+func New(
+	tokenRepo TokenRepo,
+	authorRepo AuthorRepo,
+	logger *slog.Logger,
+) Service {
+
 	return Service{
 		tokenRepo:  tokenRepo,
 		authorRepo: authorRepo,
+		logger:     logger,
 	}
 }
 
@@ -30,13 +38,23 @@ func (s Service) AuthorizedByToken(value string) (shared.Author, error) {
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = auth.AccountNotFoundErr
+		} else {
+			s.logger.Error("Got an error while trying to authorize author by token", slog.Any("err", err))
+			err = errs.Unknown
 		}
 
 		return shared.Author{}, err
 	}
 
-	// if we have authorized account here we cannot get missing-id error
-	return s.authorRepo.ById(ids.AuthorId)
+	author, err := s.authorRepo.ById(ids.AuthorId)
+	if err != nil {
+		s.logger.Error("Got an error while fetching author by id", slog.Any("err", err))
+
+		// if we have authorized account here we cannot get missing-id error
+		err = errs.Unknown
+	}
+
+	return author, err
 }
 
 func (s Service) AuthorizeByCredentials(auth shared.AuthorCreds) (shared.Author, shared.AuthResult, error) {
@@ -44,6 +62,9 @@ func (s Service) AuthorizeByCredentials(auth shared.AuthorCreds) (shared.Author,
 	if err != nil {
 		if errors.Is(err, errs.KeyMissingInStorage) {
 			err = CredentialsNotFound
+		} else {
+			s.logger.Error("Got an error while trying to authorize author by creds", slog.Any("err", err))
+			err = errs.Unknown
 		}
 
 		return shared.Author{}, shared.AuthResult{}, err
@@ -58,7 +79,9 @@ func (s Service) AuthorizeByCredentials(auth shared.AuthorCreds) (shared.Author,
 
 	err = s.tokenRepo.Create(token)
 	if err != nil {
-		return shared.Author{}, shared.AuthResult{}, err
+		s.logger.Error("Got an error while creating auth token", slog.Any("err", err))
+
+		return shared.Author{}, shared.AuthResult{}, errs.Unknown
 	}
 
 	result := shared.AuthResult{

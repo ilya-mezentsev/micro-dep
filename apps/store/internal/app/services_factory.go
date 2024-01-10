@@ -1,6 +1,7 @@
 package app
 
 import (
+	"log/slog"
 	"sync"
 
 	"github.com/jmoiron/sqlx"
@@ -13,12 +14,14 @@ import (
 type ServicesFactory struct {
 	sync.Mutex
 	db               *sqlx.DB
+	logger           *slog.Logger
 	account2services map[models.Id]services.Services
 }
 
-func NewServicesFactory(db *sqlx.DB) *ServicesFactory {
+func NewServicesFactory(db *sqlx.DB, logger *slog.Logger) *ServicesFactory {
 	return &ServicesFactory{
 		db:               db,
+		logger:           logger,
 		account2services: map[models.Id]services.Services{},
 	}
 }
@@ -32,7 +35,7 @@ func (sf *ServicesFactory) Services(accountId models.Id) services.Services {
 	}
 
 	repos := repositories.New(sf.db, accountId)
-	ss := services.New(repos)
+	ss := services.New(repos, sf.logger)
 	sf.account2services[accountId] = ss
 
 	return ss

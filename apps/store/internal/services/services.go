@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log/slog"
+
 	"github.com/ilya-mezentsev/micro-dep/store/internal/repositories"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/endpoint"
 	"github.com/ilya-mezentsev/micro-dep/store/internal/services/entity"
@@ -13,11 +15,11 @@ type Services struct {
 	relation relation.Service
 }
 
-func New(repositories repositories.Repositories) Services {
+func New(repositories repositories.Repositories, logger *slog.Logger) Services {
 	return Services{
-		entity:   entity.NewServiceImpl(repositories.Entity()),
-		endpoint: endpoint.NewServiceImpl(repositories.Endpoint()),
-		relation: relation.NewServiceImpl(repositories.Relation()),
+		entity:   entity.NewServiceImpl(repositories.Entity(), logger),
+		endpoint: endpoint.NewServiceImpl(repositories.Endpoint(), logger),
+		relation: relation.NewServiceImpl(repositories.Relation(), logger),
 	}
 }
 

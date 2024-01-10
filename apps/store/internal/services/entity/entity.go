@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/frankenbeanies/uuid4"
 
@@ -11,17 +12,23 @@ import (
 )
 
 type ServiceImpl struct {
-	repo Repo
+	repo   Repo
+	logger *slog.Logger
 }
 
-func NewServiceImpl(repo Repo) ServiceImpl {
-	return ServiceImpl{repo: repo}
+func NewServiceImpl(repo Repo, logger *slog.Logger) ServiceImpl {
+	return ServiceImpl{
+		repo:   repo,
+		logger: logger,
+	}
 }
 
 func (s ServiceImpl) Create(model shared.Entity) (shared.Entity, error) {
 	exists, err := s.repo.Exists(model.Name)
 	if err != nil {
-		return shared.Entity{}, err
+		s.logger.Error("Got an error while checking entity existence", slog.Any("err", err))
+
+		return shared.Entity{}, errs.Unknown
 	} else if exists {
 		return shared.Entity{}, shared.AlreadyExists
 	}
@@ -32,17 +39,37 @@ func (s ServiceImpl) Create(model shared.Entity) (shared.Entity, error) {
 		model.Endpoints[i].Id = models.Id(uuid4.New().String())
 	}
 
-	return s.repo.Create(model)
+	entity, err := s.repo.Create(model)
+	if err != nil {
+		s.logger.Error("Got an error while creating entity", slog.Any("err", err))
+		err = errs.Unknown
+	}
+
+	return entity, err
 }
 
 func (s ServiceImpl) ReadAll() ([]shared.Entity, error) {
-	return s.repo.ReadAll()
+	entities, err := s.repo.ReadAll()
+	if err != nil {
+		s.logger.Error("Got an error while reading all entities", slog.Any("err", err))
+		err = errs.Unknown
+	}
+
+	return entities, err
 }
 
 func (s ServiceImpl) ReadOne(id models.Id) (shared.Entity, error) {
 	m, err := s.repo.ReadOne(id)
 	if errors.Is(err, errs.IdMissingInStorage) {
 		err = shared.NotFoundById
+	} else if err != nil {
+		s.logger.Error(
+			"Got an error while reading entity by id",
+			slog.Any("err", err),
+			slog.String("entity-id", string(id)),
+		)
+
+		err = errs.Unknown
 	}
 
 	return m, err
@@ -53,6 +80,14 @@ func (s ServiceImpl) Update(model shared.Entity) (shared.Entity, error) {
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = shared.NotFoundById
+		} else {
+			s.logger.Error(
+				"Got an error while fetching entity relations",
+				slog.Any("err", err),
+				slog.String("entity-id", string(model.Id)),
+			)
+
+			err = errs.Unknown
 		}
 
 		return shared.Entity{}, err
@@ -61,7 +96,18 @@ func (s ServiceImpl) Update(model shared.Entity) (shared.Entity, error) {
 	}
 
 	// fixme: should we consider situation when entity is deleted here?
-	return s.repo.Update(model)
+	entity, err := s.repo.Update(model)
+	if err != nil {
+		s.logger.Error(
+			"Got an error while updating entity",
+			slog.Any("err", err),
+			slog.String("entity-id", string(model.Id)),
+		)
+
+		err = errs.Unknown
+	}
+
+	return entity, err
 }
 
 func (s ServiceImpl) checkAllEndpointsInUseRemained(model shared.Entity, endpointsInUse []shared.Endpoint) bool {
@@ -89,6 +135,14 @@ func (s ServiceImpl) Delete(id models.Id) error {
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = shared.NotFoundById
+		} else {
+			s.logger.Error(
+				"Got an error while fetching entity relations",
+				slog.Any("err", err),
+				slog.String("entity-id", string(id)),
+			)
+
+			err = errs.Unknown
 		}
 
 		return err
@@ -96,5 +150,16 @@ func (s ServiceImpl) Delete(id models.Id) error {
 		return TryingToRemoveEntityThatIsUse
 	}
 
-	return s.repo.Delete(id)
+	err = s.repo.Delete(id)
+	if err != nil {
+		s.logger.Error(
+			"Got an error while deleting entity",
+			slog.Any("err", err),
+			slog.String("entity-id", string(id)),
+		)
+
+		err = errs.Unknown
+	}
+
+	return err
 }

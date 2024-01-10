@@ -1,6 +1,8 @@
 package relation
 
 import (
+	"io"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -54,7 +56,7 @@ func TestServiceImpl_Create(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 
 		{
@@ -91,13 +93,13 @@ func TestServiceImpl_Create(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			_, err := s.Create(tt.model)
 
 			require.Equal(t, tt.expected, err)
@@ -133,13 +135,13 @@ func TestServiceImpl_ReadAll(t *testing.T) {
 				return m
 			},
 			expectedModels: nil,
-			expectedError:  sharedMocks.SomeError,
+			expectedError:  errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 			allModels, err := s.ReadAll()
 
 			require.Equal(t, tt.expectedModels, allModels)
@@ -153,7 +155,7 @@ func TestServiceImpl_ReadOne(t *testing.T) {
 		require.NotNil(t, recover())
 	}()
 
-	_, _ = NewServiceImpl(relationMocks.NewMockRepo(t)).ReadOne(sharedMocks.Relations[0].Id)
+	_, _ = NewServiceImpl(relationMocks.NewMockRepo(t), slog.New(slog.NewTextHandler(io.Discard, nil))).ReadOne(sharedMocks.Relations[0].Id)
 }
 
 func TestServiceImpl_Delete(t *testing.T) {
@@ -184,13 +186,13 @@ func TestServiceImpl_Delete(t *testing.T) {
 
 				return m
 			},
-			expected: sharedMocks.SomeError,
+			expected: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewServiceImpl(tt.mockConstructor())
+			s := NewServiceImpl(tt.mockConstructor(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			require.Equal(t, tt.expected, s.Delete(tt.modelId))
 		})

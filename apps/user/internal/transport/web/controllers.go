@@ -2,8 +2,10 @@ package web
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
+	slogGin "github.com/samber/slog-gin"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/types/configs"
 	"github.com/ilya-mezentsev/micro-dep/user/internal/services"
@@ -13,11 +15,15 @@ import (
 func Start(
 	webSettings configs.Web,
 	services services.Services,
+	logger *slog.Logger,
 ) {
 
 	r := gin.New()
 
-	r.Use(gin.Recovery())
+	r.Use(
+		slogGin.New(logger),
+		gin.Recovery(),
+	)
 
 	apiGroup := r.Group("/api/user")
 

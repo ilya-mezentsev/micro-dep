@@ -2,6 +2,7 @@ package relation
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/frankenbeanies/uuid4"
 
@@ -11,11 +12,15 @@ import (
 )
 
 type ServiceImpl struct {
-	repo Repo
+	repo   Repo
+	logger *slog.Logger
 }
 
-func NewServiceImpl(repo Repo) ServiceImpl {
-	return ServiceImpl{repo: repo}
+func NewServiceImpl(repo Repo, logger *slog.Logger) ServiceImpl {
+	return ServiceImpl{
+		repo:   repo,
+		logger: logger,
+	}
 }
 
 func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
@@ -23,6 +28,15 @@ func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
 			err = shared.NotFoundById
+		} else {
+			s.logger.Error(
+				"Got an error while checking relation parts existence",
+				slog.Any("err", err),
+				slog.String("from-entity-id", string(model.FromEntityId)),
+				slog.String("to-endpoint-id", string(model.ToEndpointId)),
+			)
+
+			err = errs.Unknown
 		}
 
 		return shared.Relation{}, err
@@ -33,12 +47,29 @@ func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
 	}
 
 	model.Id = models.Id(uuid4.New().String())
+	relation, err := s.repo.Create(model)
+	if err != nil {
+		s.logger.Error(
+			"Got an error while creating relation",
+			slog.Any("err", err),
+			slog.String("from-entity-id", string(model.FromEntityId)),
+			slog.String("to-endpoint-id", string(model.ToEndpointId)),
+		)
 
-	return s.repo.Create(model)
+		err = errs.Unknown
+	}
+
+	return relation, err
 }
 
 func (s ServiceImpl) ReadAll() ([]shared.Relation, error) {
-	return s.repo.ReadAll()
+	relations, err := s.repo.ReadAll()
+	if err != nil {
+		s.logger.Error("Got an error while reading all relations", slog.Any("err", err))
+		err = errs.Unknown
+	}
+
+	return relations, err
 }
 
 func (s ServiceImpl) ReadOne(_ models.Id) (shared.Relation, error) {
@@ -46,5 +77,16 @@ func (s ServiceImpl) ReadOne(_ models.Id) (shared.Relation, error) {
 }
 
 func (s ServiceImpl) Delete(id models.Id) error {
-	return s.repo.Delete(id)
+	err := s.repo.Delete(id)
+	if err != nil {
+		s.logger.Error(
+			"Got an error while deleting relation",
+			slog.Any("err", err),
+			slog.String("relation-id", string(id)),
+		)
+
+		err = errs.Unknown
+	}
+
+	return err
 }

@@ -1,6 +1,8 @@
 package session
 
 import (
+	"io"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -88,7 +90,7 @@ func TestService_AuthorizedByToken(t *testing.T) {
 				return tokenRepo, nil
 			},
 			expectedAuthor: shared.Author{},
-			expectedErr:    sharedMocks.SomeError,
+			expectedErr:    errs.Unknown,
 		},
 
 		{
@@ -104,14 +106,14 @@ func TestService_AuthorizedByToken(t *testing.T) {
 				return tokenRepo, authorRepo
 			},
 			expectedAuthor: shared.Author{},
-			expectedErr:    sharedMocks.SomeError,
+			expectedErr:    errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tr, ar := tt.mocksConstructor()
-			s := New(tr, ar)
+			s := New(tr, ar, slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			author, err := s.AuthorizedByToken(tt.token)
 
@@ -168,7 +170,7 @@ func TestService_AuthorizeByCredentials(t *testing.T) {
 				return nil, authorRepo
 			},
 			expectedAuthor: shared.Author{},
-			expectedErr:    sharedMocks.SomeError,
+			expectedErr:    errs.Unknown,
 		},
 
 		{
@@ -184,14 +186,14 @@ func TestService_AuthorizeByCredentials(t *testing.T) {
 				return tokenRepo, authorRepo
 			},
 			expectedAuthor: shared.Author{},
-			expectedErr:    sharedMocks.SomeError,
+			expectedErr:    errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tr, ar := tt.mocksConstructor()
-			s := New(tr, ar)
+			s := New(tr, ar, slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			author, authResult, err := s.AuthorizeByCredentials(tt.creds)
 

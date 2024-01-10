@@ -1,12 +1,15 @@
 package register
 
 import (
+	"io"
+	"log/slog"
 	"testing"
 
 	"github.com/frankenbeanies/uuid4"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	registerMocks "github.com/ilya-mezentsev/micro-dep/user/internal/services/register/mocks"
 	"github.com/ilya-mezentsev/micro-dep/user/internal/services/shared"
@@ -66,14 +69,14 @@ func TestService_AccountExists(t *testing.T) {
 				return accountMock, nil
 			},
 			expected:    false,
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			acc, author := tt.mocksConstructor()
-			service := New(acc, author)
+			service := New(acc, author, slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			exists, err := service.AccountExists(tt.accountId)
 
@@ -127,7 +130,7 @@ func TestService_Register(t *testing.T) {
 
 				return nil, authorMock
 			},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 
 		{
@@ -142,7 +145,7 @@ func TestService_Register(t *testing.T) {
 
 				return accountMock, authorMock
 			},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 
 		{
@@ -158,14 +161,14 @@ func TestService_Register(t *testing.T) {
 
 				return accountMock, authorMock
 			},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			acc, author := tt.mocksConstructor()
-			service := New(acc, author)
+			service := New(acc, author, slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			a, err := service.Register(someCreds)
 
@@ -225,7 +228,7 @@ func TestService_RegisterForAccount(t *testing.T) {
 
 				return accountMock, nil
 			},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 
 		{
@@ -257,7 +260,7 @@ func TestService_RegisterForAccount(t *testing.T) {
 
 				return accountMock, authorMock
 			},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 
 		{
@@ -274,14 +277,14 @@ func TestService_RegisterForAccount(t *testing.T) {
 
 				return accountMock, authorMock
 			},
-			expectedErr: sharedMocks.SomeError,
+			expectedErr: errs.Unknown,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			acc, author := tt.mocksConstructor()
-			service := New(acc, author)
+			service := New(acc, author, slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 			a, err := service.RegisterForAccount(tt.accountId, someCreds)
 

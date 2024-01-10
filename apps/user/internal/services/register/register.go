@@ -1,10 +1,12 @@
 package register
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/frankenbeanies/uuid4"
 
+	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	"github.com/ilya-mezentsev/micro-dep/user/internal/services/shared"
 )
@@ -12,16 +14,19 @@ import (
 type Service struct {
 	accountRepo AccountRepo
 	authorRepo  AuthorRepo
+	logger      *slog.Logger
 }
 
 func New(
 	accountRepo AccountRepo,
 	authorRepo AuthorRepo,
+	logger *slog.Logger,
 ) Service {
 
 	return Service{
 		accountRepo: accountRepo,
 		authorRepo:  authorRepo,
+		logger:      logger,
 	}
 }
 
@@ -36,7 +41,9 @@ func (s Service) Register(creds shared.AuthorCreds) (shared.Author, error) {
 		RegisteredAt: time.Now().Unix(),
 	})
 	if err != nil {
-		return shared.Author{}, err
+		s.logger.Error("Got an error while creating account", slog.Any("err", err))
+
+		return shared.Author{}, errs.Unknown
 	}
 
 	// NOTE. If we failed here, account created above will remain in DB
@@ -46,7 +53,9 @@ func (s Service) Register(creds shared.AuthorCreds) (shared.Author, error) {
 func (s Service) validateUsername(username string) error {
 	usernameExists, err := s.authorRepo.UsernameExists(username)
 	if err != nil {
-		return err
+		s.logger.Error("Got an error while checking username existence", slog.Any("err", err))
+
+		return errs.Unknown
 	} else if usernameExists {
 		return UsernameExists
 	}
@@ -57,7 +66,9 @@ func (s Service) validateUsername(username string) error {
 func (s Service) RegisterForAccount(accountId models.Id, creds shared.AuthorCreds) (shared.Author, error) {
 	accountExits, err := s.accountRepo.Exists(accountId)
 	if err != nil {
-		return shared.Author{}, err
+		s.logger.Error("Got an error while checking account existence", slog.Any("err", err))
+
+		return shared.Author{}, errs.Unknown
 	} else if !accountExits {
 		return shared.Author{}, AccountNotFound
 	}
@@ -77,10 +88,20 @@ func (s Service) register(accountId models.Id, creds shared.AuthorCreds) (shared
 		RegisteredAt: time.Now().Unix(),
 	}
 	err := s.authorRepo.Create(result, creds.Password)
+	if err != nil {
+		s.logger.Error("Got an error while creating author", slog.Any("err", err))
+		err = errs.Unknown
+	}
 
 	return result, err
 }
 
 func (s Service) AccountExists(accountId models.Id) (bool, error) {
-	return s.accountRepo.Exists(accountId)
+	exists, err := s.accountRepo.Exists(accountId)
+	if err != nil {
+		s.logger.Error("Got an error while checking account existence", slog.Any("err", err))
+		err = errs.Unknown
+	}
+
+	return exists, err
 }
