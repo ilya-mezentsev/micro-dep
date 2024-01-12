@@ -84,6 +84,7 @@ func (s Session) Post(context *gin.Context) {
 func (s Session) Delete(context *gin.Context) {
 	rb := shared.MakeResponseBuilder(context)
 
+	// TODO. Delete token from DB?
 	context.SetCookie(
 		sharedMiddleware.CookieName,
 		"",

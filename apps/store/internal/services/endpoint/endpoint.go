@@ -40,6 +40,7 @@ func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
 
 		return shared.Endpoint{}, err
 	} else if !entityExists {
+		// FIXME. Is not errs.IdMissingInStorage error enough?
 		return shared.Endpoint{}, TryingToAddEndpointToMissingEntity
 	} else if endpointExists {
 		return shared.Endpoint{}, TryingToCreateEndpointThatExists
@@ -77,6 +78,7 @@ func (s ServiceImpl) Update(model shared.Endpoint) (shared.Endpoint, error) {
 
 		return shared.Endpoint{}, err
 	} else if !endpointExists {
+		// FIXME. Is not errs.IdMissingInStorage error enough?
 		return shared.Endpoint{}, TryingToUpdateMissingEndpoint
 	}
 

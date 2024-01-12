@@ -1,0 +1,581 @@
+openapi: 3.0.3
+info:
+  title: Micro-dep store service API
+  description: Micro-dep store service API
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000/api/dependencies'
+
+paths:
+  /entities:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+    get:
+      summary: Get account entities
+      responses:
+        200:
+          description: Entities list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitiesResponse'
+        401:
+          description: Unauthorized (no token in cookie)
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /entity/{id}:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+      - in: path
+        name: id
+        schema:
+          type: string
+          example: c5d6f777-8195-4908-af7d-6e3c1cd2460e
+        required: true
+        description: Entity id
+
+    get:
+      summary: Get entity by id
+      responses:
+        200:
+          description: Entity response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+        401:
+          description: Unauthorized (no token in cookie)
+        404:
+          description: Entity with provided id is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundByIdError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+    delete:
+      summary: Delete entity by id
+      responses:
+        204:
+          description: Entity is deleted successfully
+        401:
+          description: Unauthorized (no token in cookie)
+        404:
+          description: Entity with provided id is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundByIdError'
+        419:
+          description: Trying to remove entity in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TryingToRemoveEntityInUseError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /entity:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+    post:
+      summary: Create entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
+      responses:
+        200:
+          description: Entity is created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+        400:
+          description: Bad request (i.e. invalid JSON)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralClientError'
+        401:
+          description: Unauthorized (no token in cookie)
+        409:
+          description: Entity with provided name is already exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlreadyExistsError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+    put:
+      summary: Update entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
+      responses:
+        200:
+          description: Entity is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+        400:
+          description: Bad request (i.e. invalid JSON)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralClientError'
+        401:
+          description: Unauthorized (no token in cookie)
+        404:
+          description: Entity with provided id is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundByIdError'
+        409:
+          description: Trying to remove endpoint that is in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TryingToRemoveEndpointInUseError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /endpoint:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+    post:
+      description: Create endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Endpoint'
+      responses:
+        200:
+          description: Endpoint is created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoint'
+        401:
+          description: Unauthorized (no token in cookie)
+        404:
+          description: Endpoint's entity with provided id is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundByIdError'
+        409:
+          description: Trying to add endpoint to missed entity or create endpoint that already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TryingToCreateConflictedEndpoint'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+    put:
+      description: Update endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Endpoint'
+      responses:
+        200:
+          description: Endpoint is updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoint'
+        401:
+          description: Unauthorized (no token in cookie)
+        404:
+          description: Endpoint's entity with provided id is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundByIdError'
+        409:
+          description: Trying to update endpoint that not exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TryingToUpdateEndpointThatNotExists'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /endpoint/{id}:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+      - in: path
+        name: id
+        schema:
+          type: string
+          example: c5d6f777-8195-4908-af7d-6e3c1cd2460e
+        required: true
+        description: Endpoint id
+
+    delete:
+      description: Delete endpoint
+      responses:
+        204:
+          description: Endpoint is deleted successfully
+        401:
+          description: Unauthorized (no token in cookie)
+        404:
+          description: Endpoint with provided id is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundByIdError'
+        409:
+          description: Trying to remove endpoint that has relation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TryingToRemoveEndpointThatHasRelationError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /relations:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+    get:
+      description: Read all account relations
+      responses:
+        200:
+          description: Relations response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelationsResponse'
+        401:
+          description: Unauthorized (no token in cookie)
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /relation:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+    post:
+      description: Create relation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relation'
+      responses:
+        200:
+          description: Relation is successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelationResponse'
+        401:
+          description: Unauthorized (no token in cookie)
+        404:
+          description: One of the relation ids is missed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundByIdError'
+        409:
+          description: Trying to created conflicted relation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TryingToCreatedConflictedRelation'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /relation/{id}:
+    parameters:
+      - in: cookie
+        name: X-Auth-Token
+        description: Authorization token
+        required: true
+        schema:
+          type: string
+          example: 61b8bb0b-7561-47b5-a90f-a5db42263cd7
+
+      - in: path
+        name: id
+        schema:
+          type: string
+          example: c5d6f777-8195-4908-af7d-6e3c1cd2460e
+        required: true
+        description: Relation id
+
+    delete:
+      description: Delete relation
+      responses:
+        204:
+          description: Relation is deleted successfully
+        401:
+          description: Unauthorized (no token in cookie)
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+components:
+  schemas:
+    Entity:
+      type: object
+      properties:
+        id:
+          type: string
+          example: c332c855-6b4c-4582-97f2-5ad196ff436c
+        author_id:
+          type: string
+          example: 32f157cc-23bc-4bc4-a40c-ad9384406809
+        name:
+          type: string
+        description:
+          type: string
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
+
+    Endpoint:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 32f157cc-23bc-4bc4-a40c-ad9384406809
+        entity_id:
+          type: string
+          example: c332c855-6b4c-4582-97f2-5ad196ff436c
+        kind:
+          type: string
+          example: http-addr
+        address:
+          type: string
+          example: /api/v1/user
+
+    Relation:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 0793312a-d42a-455a-984a-bfa9dbb80e86
+        from_entity_id:
+          type: string
+          example: c332c855-6b4c-4582-97f2-5ad196ff436c
+        to_endpoint_id:
+          type: string
+          example: 32f157cc-23bc-4bc4-a40c-ad9384406809
+
+    EntitiesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+
+    EntityResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Entity'
+
+    RelationsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relation'
+
+    RelationResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Relation'
+
+    TryingToRemoveEntityInUseError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - trying-to-remove-entity-that-is-in-use
+
+    TryingToRemoveEndpointInUseError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - trying-to-remove-endpoint-that-is-in-use
+
+    TryingToRemoveEndpointThatHasRelationError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - trying-to-remove-endpoint-that-has-relation
+
+    TryingToCreateConflictedEndpoint:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - trying-to-create-endpoint-that-exists
+            - trying-to-add-endpoint-to-missing-entity
+
+    TryingToUpdateEndpointThatNotExists:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - trying-to-update-missing-endpoint
+
+    TryingToCreatedConflictedRelation:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - trying-to-create-relation-from-missed-entity
+            - trying-to-create-relation-to-missed-endpoint
+
+    NotFoundByIdError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - not-found-by-id
+
+    AlreadyExistsError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - already-exists
+
+    GeneralClientError:
+      type: object
+      properties:
+        error:
+          type: string
+
+    UnknownError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - unknown-error

@@ -1,0 +1,235 @@
+openapi: 3.0.3
+info:
+  title: Micro-dep user service API
+  description: Micro-dep user service API
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000/api/user'
+
+paths:
+  /session:
+    get:
+      summary: Get user session from cookie
+      responses:
+        200:
+          description: Session is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        401:
+          description: No cookie was found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoCookieError'
+        404:
+          description: No account was found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountNotFoundError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+    post:
+      summary: Create user session by credentials
+      responses:
+        200:
+          description: Authorization is succeed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        400:
+          description: Bad request (i.e. invalid JSON)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralClientError'
+        404:
+          description: Credentials not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialsMissedError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+    delete:
+      summary: Delete user session from cookie
+      responses:
+        204:
+          description: Token deleted from cookie
+
+  /account:
+    post:
+      summary: Register user and new account
+      responses:
+        200:
+          description: Authorization is succeed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        400:
+          description: Bad request (i.e. invalid JSON)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralClientError'
+        409:
+          description: Username is already exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameExistsError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+  /account/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          example: c5d6f777-8195-4908-af7d-6e3c1cd2460e
+        required: true
+        description: Account id
+
+    get:
+      summary: Check account existence
+      responses:
+        204:
+          description: Account is exist
+        404:
+          description: Account is not exist
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+    post:
+      summary: Register user for particular account
+      responses:
+        200:
+          description: Authorization is succeed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        400:
+          description: Bad request (i.e. invalid JSON)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralClientError'
+        404:
+          description: Account with provided id is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountNotFoundError'
+        409:
+          description: Username is already exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameExistsError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
+components:
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+          example: c5d6f777-8195-4908-af7d-6e3c1cd2460e
+        account_id:
+          type: string
+          example: 4a7b8037-2cba-4667-bf1b-a2d227c7b80b
+        username:
+          type: string
+        registered_at:
+          type: integer
+          example: 1699191331
+
+    AuthorCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AuthorResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Author'
+
+    NoCookieError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - no-token-in-cookie
+
+    AccountNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - account-not-found
+
+    CredentialsMissedError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - credentials-not-found
+
+    UsernameExistsError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - username-exists
+
+    GeneralClientError:
+      type: object
+      properties:
+        error:
+          type: string
+
+    UnknownError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - unknown-error

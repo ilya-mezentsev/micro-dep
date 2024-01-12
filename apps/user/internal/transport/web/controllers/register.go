@@ -44,7 +44,7 @@ func (r Register) Register(context *gin.Context) {
 	author, err := r.service.Register(creds)
 	if err != nil {
 		if errors.Is(err, register.UsernameExists) {
-			rb.ClientError(err)
+			rb.ConflictError(err)
 		} else {
 			rb.InternalError(err)
 		}
@@ -68,7 +68,7 @@ func (r Register) RegisterForAccount(context *gin.Context) {
 	)
 	if err != nil {
 		if errors.Is(err, register.UsernameExists) {
-			rb.ClientError(err)
+			rb.ConflictError(err)
 		} else if errors.Is(err, register.AccountNotFound) {
 			rb.NotFoundError(err)
 		} else {

@@ -12,11 +12,12 @@ import (
 )
 
 const (
-	updateEndpointQuery      = `UPDATE entity_endpoint SET kind = :kind, address = :address WHERE id = :id`
-	deleteEndpointQuery      = `DELETE FROM entity_endpoint WHERE id = $1`
-	endpointExistsQuery      = `SELECT EXISTS(SELECT 1 FROM entity_endpoint WHERE id = $1)`
-	entityIdExistsQuery      = `SELECT EXISTS(SELECT 1 FROM entity WHERE id = $1)`
-	endpointHasRelationQuery = `SELECT EXISTS(SELECT 1 FROM dependency WHERE to_id = $1)`
+	updateEndpointQuery       = `UPDATE entity_endpoint SET kind = :kind, address = :address WHERE id = :id`
+	deleteEndpointQuery       = `DELETE FROM entity_endpoint WHERE id = $1`
+	endpointWithIdExistsQuery = `SELECT EXISTS(SELECT 1 FROM entity_endpoint WHERE id = $1)`
+	endpointExistsQuery       = `SELECT EXISTS(SELECT 1 FROM entity_endpoint WHERE entity_id = $1 AND kind = $2 AND address = $3)`
+	entityIdExistsQuery       = `SELECT EXISTS(SELECT 1 FROM entity WHERE id = $1)`
+	endpointHasRelationQuery  = `SELECT EXISTS(SELECT 1 FROM dependency WHERE to_id = $1)`
 )
 
 type (
@@ -67,7 +68,7 @@ func (e endpoint) Exists(model shared.Endpoint) (bool, bool, error) {
 	}
 
 	var endpointExists bool
-	err = e.db.Get(&endpointExists, endpointExistsQuery, string(model.Id))
+	err = e.db.Get(&endpointExists, endpointExistsQuery, string(model.EntityId), model.Kind, model.Address)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = errs.IdMissingInStorage
 	}

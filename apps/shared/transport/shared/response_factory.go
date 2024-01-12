@@ -2,6 +2,7 @@ package shared
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,7 +42,7 @@ func MakeResponseBuilder(context *gin.Context) ResponseBuilder {
 }
 
 func (r responseBuilder) InternalError(err error) {
-	r.context.JSON(http.StatusInternalServerError, errorResponse{Error: err.Error()})
+	r.context.JSON(http.StatusInternalServerError, errorResponse{Error: cutError(err)})
 }
 
 func (r responseBuilder) NotImplemented() {
@@ -49,7 +50,7 @@ func (r responseBuilder) NotImplemented() {
 }
 
 func (r responseBuilder) NotFoundError(err error) {
-	r.context.JSON(http.StatusNotFound, errorResponse{Error: err.Error()})
+	r.context.JSON(http.StatusNotFound, errorResponse{Error: cutError(err)})
 }
 
 func (r responseBuilder) EmptyNotFound() {
@@ -57,15 +58,15 @@ func (r responseBuilder) EmptyNotFound() {
 }
 
 func (r responseBuilder) ClientError(err error) {
-	r.context.JSON(http.StatusBadRequest, errorResponse{Error: err.Error()})
+	r.context.JSON(http.StatusBadRequest, errorResponse{Error: cutError(err)})
 }
 
 func (r responseBuilder) UnauthorizedError(err error) {
-	r.context.JSON(http.StatusUnauthorized, errorResponse{Error: err.Error()})
+	r.context.JSON(http.StatusUnauthorized, errorResponse{Error: cutError(err)})
 }
 
 func (r responseBuilder) ConflictError(err error) {
-	r.context.JSON(http.StatusConflict, errorResponse{Error: err.Error()})
+	r.context.JSON(http.StatusConflict, errorResponse{Error: cutError(err)})
 }
 
 func (r responseBuilder) Ok(response any) {
@@ -78,4 +79,10 @@ func (r responseBuilder) Created() {
 
 func (r responseBuilder) EmptyOk() {
 	r.context.Status(http.StatusNoContent)
+}
+
+func cutError(err error) string {
+	msg := err.Error()
+
+	return strings.Split(msg, "\n")[0]
 }

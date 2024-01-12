@@ -44,7 +44,7 @@ func Start(
 	apiGroup.DELETE("/endpoint/:id", endpointController.Delete)
 
 	relationController := controllers.NewRelation(servicesFactory)
-	apiGroup.GET("/relation", relationController.ReadAll)
+	apiGroup.GET("/relations", relationController.ReadAll)
 	apiGroup.POST("/relation", relationController.Create)
 	apiGroup.DELETE("/relation/:id", relationController.Delete)
 

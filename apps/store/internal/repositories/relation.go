@@ -82,7 +82,7 @@ func (r relation) PartsExist(model shared.Relation) (bool, bool, error) {
 	}
 
 	var endpointExists bool
-	err = r.db.Get(&endpointExists, endpointExistsQuery, string(model.ToEndpointId))
+	err = r.db.Get(&endpointExists, endpointWithIdExistsQuery, string(model.ToEndpointId))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = errs.IdMissingInStorage

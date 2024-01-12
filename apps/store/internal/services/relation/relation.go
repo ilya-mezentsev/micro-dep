@@ -41,8 +41,10 @@ func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
 
 		return shared.Relation{}, err
 	} else if !entityExists {
+		// FIXME. Is not shared.NotFoundById error enough
 		return shared.Relation{}, TryingToCreateRelationFromMissedEntity
 	} else if !endpointExists {
+		// FIXME. Is not shared.NotFoundById error enough
 		return shared.Relation{}, TryingToCreateRelationToMissedEndpoint
 	}
 

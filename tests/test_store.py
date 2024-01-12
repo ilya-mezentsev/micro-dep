@@ -79,7 +79,7 @@ def test_create_entity_with_exists_name() -> None:
         'description': lorem.paragraph(),
     })
 
-    assert response['error'].split('\n')[0] == 'already-exists'
+    assert response['error'] == 'already-exists'
 
 
 def test_update_entity() -> None:
@@ -105,7 +105,7 @@ def test_update_entity_remove_endpoint_in_use() -> None:
             'endpoints': entity_with_endpoints['endpoints'][1:]
         })
 
-        assert response['error'].split('\n')[0] == 'trying-to-remove-endpoint-that-is-in-use'
+        assert response['error'] == 'trying-to-remove-endpoint-that-is-in-use'
     finally:
         delete_relation(relation['id'])
 
@@ -129,7 +129,7 @@ def test_delete_entity_in_use() -> None:
     try:
         response = delete_entity_expect_error(entity_with_endpoints['id'])
 
-        assert response['error'].split('\n')[0] == 'trying-to-remove-endpoint-that-is-in-use'
+        assert response['error'] == 'trying-to-remove-entity-that-is-in-use'
     finally:
         delete_relation(relation['id'])
 
