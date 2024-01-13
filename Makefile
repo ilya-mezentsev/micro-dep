@@ -13,8 +13,14 @@ TESTS_PYTEST := $(TESTS_VENV)/bin/pytest
 DOCKER_COMPOSE_ENTRYPOINT := $(ROOT_DIR)/docker-compose.yaml
 
 ENTRYPOINT := cmd/main.go
+COMPILATION_OUTPUT := compiled/main
 
 mocks: store-mocks user-mocks
+
+build: store-build user-build
+
+run: build
+	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up
 
 test: store-test user-test
 
@@ -36,6 +42,9 @@ e2e-setup: e2e-venv e2e-req
 user-run:
 	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
 
+user-build:
+	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go build -o $(COMPILATION_OUTPUT) $(ENTRYPOINT)
+
 user-tidy:
 	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go mod tidy
 
@@ -47,6 +56,9 @@ user-test:
 
 store-run:
 	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
+
+store-build:
+	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go build -o $(COMPILATION_OUTPUT) $(ENTRYPOINT)
 
 store-tidy:
 	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go mod tidy

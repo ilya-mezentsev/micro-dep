@@ -1,0 +1,19 @@
+{
+  "web": {
+    "port": 8081,
+    "domain": "0.0.0.0",
+    "secure_cookie": false,
+    "http_only": true
+  },
+  "db": {
+    "host": "db",
+    "port": 5432,
+    "user": "micro-dep",
+    "password": "password",
+    "db_name": "micro_dep",
+    "connection": {
+      "retry_count": 7,
+      "retry_timeout": 3
+    }
+  }
+}

@@ -2,7 +2,7 @@ import requests
 from uuid import uuid4
 
 
-base_url = 'http://localhost:8081/api/user'
+base_url = 'http://localhost:8000/api/user'
 
 session_url = f'{base_url}/session'
 account_url = f'{base_url}/account'
@@ -40,7 +40,7 @@ def test_delete_session() -> None:
     r = requests.delete(session_url)
 
     assert r.status_code == 204
-    assert r.headers['Set-Cookie'] == 'X-Auth-Token=; Path=/; Domain=localhost; HttpOnly'
+    assert r.headers['Set-Cookie'] == 'X-Auth-Token=; Path=/; HttpOnly'
 
 
 def test_register_ok() -> None:

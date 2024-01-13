@@ -73,7 +73,7 @@ func (s Session) Post(context *gin.Context) {
 		authResult.Value,
 		int(authResult.ExpiredAt),
 		"/",
-		s.config.Domain,
+		"",
 		s.config.SecureCookie,
 		s.config.HttpOnly,
 	)
@@ -90,7 +90,7 @@ func (s Session) Delete(context *gin.Context) {
 		"",
 		0,
 		"/",
-		s.config.Domain,
+		"",
 		s.config.SecureCookie,
 		s.config.HttpOnly,
 	)

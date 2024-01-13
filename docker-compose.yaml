@@ -1,6 +1,28 @@
 version: '3'
 
 services:
+  user:
+    image: ubuntu:latest
+    command: sh -c "CONFIG_PATH=/etc/micro-dep/services/user/configs/main.json /opt/micro-dep/services/user/main"
+    volumes:
+      - ./apps/user/compiled/main:/opt/micro-dep/services/user/main
+      - ./apps/user/configs/main.container.json:/etc/micro-dep/services/user/configs/main.json
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+
+  store:
+    image: ubuntu:latest
+    command: sh -c "CONFIG_PATH=/etc/micro-dep/services/store/configs/main.json /opt/micro-dep/services/store/main"
+    volumes:
+      - ./apps/store/compiled/main:/opt/micro-dep/services/store/main
+      - ./apps/store/configs/main.container.json:/etc/micro-dep/services/store/configs/main.json
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
   db:
     image: postgres:latest
     ports:
@@ -12,3 +34,13 @@ services:
       POSTGRES_DB: micro_dep
     volumes:
       - ./dump/structure.sql:/docker-entrypoint-initdb.d/init.sql
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8000:80"
+    depends_on:
+      - user
+      - store

@@ -5,7 +5,7 @@ import requests
 import lorem
 
 
-base_url = 'http://localhost:8080/api/dependencies'
+base_url = 'http://localhost:8000/api/dependencies'
 
 entities_url = f'{base_url}/entities'
 entity_url = f'{base_url}/entity'
