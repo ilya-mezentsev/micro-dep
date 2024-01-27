@@ -19,9 +19,10 @@ type Config struct {
 }
 
 func Main() {
-	settings := config.MustParse[Config](os.Getenv("CONFIG_PATH"))
-	db := connection.MustGetConnection(settings.DB)
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	settings := config.MustParse[Config](os.Getenv("CONFIG_PATH"))
+	db := connection.MustGetConnection(settings.DB, logger)
 	servicesFactory := NewServicesFactory(db, logger)
 
 	authService := auth.NewService(repositories.NewAuthToken(db), logger)

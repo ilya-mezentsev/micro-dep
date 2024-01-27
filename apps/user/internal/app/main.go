@@ -18,10 +18,11 @@ type Config struct {
 }
 
 func Main() {
-	settings := config.MustParse[Config](os.Getenv("CONFIG_PATH"))
-	db := connection.MustGetConnection(settings.DB)
-	repos := repositories.New(db)
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	settings := config.MustParse[Config](os.Getenv("CONFIG_PATH"))
+	db := connection.MustGetConnection(settings.DB, logger)
+	repos := repositories.New(db)
 
 	ss := services.New(repos, logger)
 

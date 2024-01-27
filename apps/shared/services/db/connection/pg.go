@@ -2,16 +2,16 @@ package connection
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/types/configs"
 )
 
-func MustGetConnection(c configs.DB) *sqlx.DB {
+func MustGetConnection(c configs.DB, logger *slog.Logger) *sqlx.DB {
 	var (
 		db  *sqlx.DB
 		err error
@@ -20,10 +20,10 @@ func MustGetConnection(c configs.DB) *sqlx.DB {
 	for {
 		db, err = sqlx.Open("postgres", BuildPostgresString(c))
 		if err != nil {
-			log.Errorf("Unable to open DB connection: %v. try number #%d", err, tryNumber)
+			logger.Error(fmt.Sprintf("Unable to open DB connection: %v. try number #%d", err, tryNumber))
 			time.Sleep(time.Second * time.Duration(c.Connection.RetryTimeout))
 		} else if err = db.Ping(); err != nil {
-			log.Errorf("Unable to ping DB: %v. try number #%d", err, tryNumber)
+			logger.Error(fmt.Sprintf("Unable to ping DB: %v. try number #%d", err, tryNumber))
 			time.Sleep(time.Second * time.Duration(c.Connection.RetryTimeout))
 		} else {
 			break
@@ -36,7 +36,7 @@ func MustGetConnection(c configs.DB) *sqlx.DB {
 	}
 
 	if err != nil {
-		log.Fatalf("Unable to create DB connection: %v", err)
+		panic(fmt.Sprintf("Unable to create DB connection: %v", err))
 	}
 
 	return db
