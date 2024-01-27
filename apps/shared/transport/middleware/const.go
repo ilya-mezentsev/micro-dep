@@ -1,6 +1,6 @@
 package middleware
 
 const (
-	CookieName   = "X-Auth-Token"
+	TokenName    = "X-Auth-Token"
 	AccountIdKey = "account-id"
 )

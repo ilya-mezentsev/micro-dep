@@ -8,7 +8,6 @@ import (
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
-	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
 
 const (
@@ -39,20 +38,20 @@ func newRelation(db *sqlx.DB, accountId models.Id) relation {
 	return relation{db: db, accountId: accountId}
 }
 
-func (r relation) Create(model shared.Relation) (shared.Relation, error) {
+func (r relation) Create(model models.Relation) (models.Relation, error) {
 	_, err := r.db.NamedExec(addRelationQuery, relationProxy{}.fromRelation(model))
 
 	return model, err
 }
 
-func (r relation) ReadAll() ([]shared.Relation, error) {
+func (r relation) ReadAll() ([]models.Relation, error) {
 	var proxies []relationProxy
 	err := r.db.Select(&proxies, relationsQuery, string(r.accountId))
 	if err != nil {
 		return nil, err
 	}
 
-	relations := make([]shared.Relation, len(proxies))
+	relations := make([]models.Relation, len(proxies))
 	for i, proxy := range proxies {
 		relations[i] = proxy.toRelation()
 	}
@@ -60,7 +59,7 @@ func (r relation) ReadAll() ([]shared.Relation, error) {
 	return relations, nil
 }
 
-func (r relation) ReadOne(_ models.Id) (shared.Relation, error) {
+func (r relation) ReadOne(_ models.Id) (models.Relation, error) {
 	panic("not implemented")
 }
 
@@ -70,7 +69,7 @@ func (r relation) Delete(id models.Id) error {
 	return err
 }
 
-func (r relation) PartsExist(model shared.Relation) (bool, bool, error) {
+func (r relation) PartsExist(model models.Relation) (bool, bool, error) {
 	var entityExists bool
 	err := r.db.Get(&entityExists, entityIdExistsQuery, string(model.FromEntityId))
 	if err != nil {
@@ -94,7 +93,7 @@ func (r relation) PartsExist(model shared.Relation) (bool, bool, error) {
 	return entityExists, endpointExists, err
 }
 
-func (rp relationProxy) fromRelation(r shared.Relation) relationProxy {
+func (rp relationProxy) fromRelation(r models.Relation) relationProxy {
 	return relationProxy{
 		Id:     string(r.Id),
 		FromId: string(r.FromEntityId),
@@ -102,8 +101,8 @@ func (rp relationProxy) fromRelation(r shared.Relation) relationProxy {
 	}
 }
 
-func (rp relationProxy) toRelation() shared.Relation {
-	return shared.Relation{
+func (rp relationProxy) toRelation() models.Relation {
+	return models.Relation{
 		Id:           models.Id(rp.Id),
 		FromEntityId: models.Id(rp.FromId),
 		ToEndpointId: models.Id(rp.ToId),

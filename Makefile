@@ -19,8 +19,11 @@ mocks: store-mocks user-mocks
 
 build: store-build user-build
 
-run: build
+run: down build
 	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up
+
+down:
+	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) down -v
 
 test: store-test user-test
 
@@ -71,6 +74,3 @@ store-test:
 
 db-run:
 	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up -d db
-
-down:
-	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) down -v

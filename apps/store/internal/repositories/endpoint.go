@@ -8,7 +8,6 @@ import (
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
-	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
 
 const (
@@ -38,13 +37,13 @@ func newEndpoint(db *sqlx.DB, accountId models.Id) endpoint {
 	return endpoint{db: db, accountId: accountId}
 }
 
-func (e endpoint) Create(model shared.Endpoint) (shared.Endpoint, error) {
+func (e endpoint) Create(model models.Endpoint) (models.Endpoint, error) {
 	_, err := e.db.NamedExec(addEndpointQuery, endpointProxy{}.fromEndpoint(model))
 
 	return model, err
 }
 
-func (e endpoint) Update(model shared.Endpoint) (shared.Endpoint, error) {
+func (e endpoint) Update(model models.Endpoint) (models.Endpoint, error) {
 	_, err := e.db.NamedExec(updateEndpointQuery, endpointProxy{}.fromEndpoint(model))
 
 	return model, err
@@ -56,7 +55,7 @@ func (e endpoint) Delete(id models.Id) error {
 	return err
 }
 
-func (e endpoint) Exists(model shared.Endpoint) (bool, bool, error) {
+func (e endpoint) Exists(model models.Endpoint) (bool, bool, error) {
 	var entityExists bool
 	err := e.db.Get(&entityExists, entityIdExistsQuery, string(model.EntityId))
 	if err != nil {
@@ -86,7 +85,7 @@ func (e endpoint) HasRelation(endpointId models.Id) (bool, error) {
 	return hasRelation, err
 }
 
-func (ep endpointProxy) fromEndpoint(e shared.Endpoint) endpointProxy {
+func (ep endpointProxy) fromEndpoint(e models.Endpoint) endpointProxy {
 	return endpointProxy{
 		Id:       string(e.Id),
 		EntityId: string(e.EntityId),
@@ -95,8 +94,8 @@ func (ep endpointProxy) fromEndpoint(e shared.Endpoint) endpointProxy {
 	}
 }
 
-func (ep endpointProxy) toEndpoint() shared.Endpoint {
-	return shared.Endpoint{
+func (ep endpointProxy) toEndpoint() models.Endpoint {
+	return models.Endpoint{
 		Id:       models.Id(ep.Id),
 		EntityId: models.Id(ep.EntityId),
 		Kind:     ep.Kind,

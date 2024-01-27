@@ -28,9 +28,9 @@ func NewSession(service session.Service, config configs.Web) Session {
 func (s Session) Get(context *gin.Context) {
 	rb := shared.MakeResponseBuilder(context)
 
-	token, err := context.Cookie(sharedMiddleware.CookieName)
+	token, err := context.Cookie(sharedMiddleware.TokenName)
 	if err != nil {
-		rb.UnauthorizedError(sharedMiddleware.NoTokenInCookie)
+		rb.UnauthorizedError(sharedMiddleware.NoAuthTokenProvided)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (s Session) Post(context *gin.Context) {
 	}
 
 	context.SetCookie(
-		sharedMiddleware.CookieName,
+		sharedMiddleware.TokenName,
 		authResult.Value,
 		int(authResult.ExpiredAt),
 		"/",
@@ -86,7 +86,7 @@ func (s Session) Delete(context *gin.Context) {
 
 	// TODO. Delete token from DB?
 	context.SetCookie(
-		sharedMiddleware.CookieName,
+		sharedMiddleware.TokenName,
 		"",
 		0,
 		"/",

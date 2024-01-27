@@ -23,7 +23,7 @@ func NewServiceImpl(repo Repo, logger *slog.Logger) ServiceImpl {
 	}
 }
 
-func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
+func (s ServiceImpl) Create(model models.Relation) (models.Relation, error) {
 	entityExists, endpointExists, err := s.repo.PartsExist(model)
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
@@ -39,13 +39,13 @@ func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
 			err = errs.Unknown
 		}
 
-		return shared.Relation{}, err
+		return models.Relation{}, err
 	} else if !entityExists {
 		// FIXME. Is not shared.NotFoundById error enough
-		return shared.Relation{}, TryingToCreateRelationFromMissedEntity
+		return models.Relation{}, TryingToCreateRelationFromMissedEntity
 	} else if !endpointExists {
 		// FIXME. Is not shared.NotFoundById error enough
-		return shared.Relation{}, TryingToCreateRelationToMissedEndpoint
+		return models.Relation{}, TryingToCreateRelationToMissedEndpoint
 	}
 
 	model.Id = models.Id(uuid4.New().String())
@@ -64,7 +64,7 @@ func (s ServiceImpl) Create(model shared.Relation) (shared.Relation, error) {
 	return relation, err
 }
 
-func (s ServiceImpl) ReadAll() ([]shared.Relation, error) {
+func (s ServiceImpl) ReadAll() ([]models.Relation, error) {
 	relations, err := s.repo.ReadAll()
 	if err != nil {
 		s.logger.Error("Got an error while reading all relations", slog.Any("err", err))
@@ -74,7 +74,7 @@ func (s ServiceImpl) ReadAll() ([]shared.Relation, error) {
 	return relations, err
 }
 
-func (s ServiceImpl) ReadOne(_ models.Id) (shared.Relation, error) {
+func (s ServiceImpl) ReadOne(_ models.Id) (models.Relation, error) {
 	panic("not implemented")
 }
 

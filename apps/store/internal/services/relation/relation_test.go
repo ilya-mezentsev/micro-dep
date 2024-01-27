@@ -18,7 +18,7 @@ import (
 func TestServiceImpl_Create(t *testing.T) {
 	tests := []struct {
 		name            string
-		model           shared.Relation
+		model           models.Relation
 		mockConstructor func() Repo
 		expected        error
 	}{
@@ -89,7 +89,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := relationMocks.NewMockRepo(t)
 				m.EXPECT().PartsExist(sharedMocks.Relations[0]).Return(true, true, nil)
-				m.EXPECT().Create(mock.Anything).Return(shared.Relation{}, sharedMocks.SomeError)
+				m.EXPECT().Create(mock.Anything).Return(models.Relation{}, sharedMocks.SomeError)
 
 				return m
 			},
@@ -111,7 +111,7 @@ func TestServiceImpl_ReadAll(t *testing.T) {
 	tests := []struct {
 		name            string
 		mockConstructor func() Repo
-		expectedModels  []shared.Relation
+		expectedModels  []models.Relation
 		expectedError   error
 	}{
 		{

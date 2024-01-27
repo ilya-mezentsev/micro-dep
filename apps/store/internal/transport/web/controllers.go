@@ -16,7 +16,7 @@ import (
 func Start(
 	webSettings configs.Web,
 	servicesFactory func(id models.Id) services.Services,
-	cookieAuthMiddleware gin.HandlerFunc,
+	authMiddleware gin.HandlerFunc,
 	logger *slog.Logger,
 ) {
 
@@ -29,7 +29,7 @@ func Start(
 
 	apiGroup := r.Group("/api/dependencies")
 
-	apiGroup.Use(cookieAuthMiddleware)
+	apiGroup.Use(authMiddleware)
 
 	entityController := controllers.NewEntity(servicesFactory)
 	apiGroup.GET("/entities", entityController.ReadAll)

@@ -12,13 +12,22 @@ entity_url = f'{base_url}/entity'
 
 relation_url = f'{base_url}/relation'
 
+account_id = 'f93676f8f379c74cefc0d9959d843ac0'
 auth_cookie = {
-    'X-Auth-Token': 'f93676f8f379c74cefc0d9959d843ac0',
+    'X-Auth-Token': account_id,
+}
+auth_header = {
+    **auth_cookie,
 }
 
 
 def test_get_all_entities() -> None:
     assert len(read_all_entities()) > 0
+
+
+def test_get_all_entities_auth_by_header() -> None:
+    d = requests.get(entities_url, headers=auth_header).json()['data']
+    assert len(d) > 0
 
 
 def test_read_one_entity() -> None:

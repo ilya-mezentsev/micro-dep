@@ -23,7 +23,7 @@ func NewServiceImpl(repo Repo, logger *slog.Logger) ServiceImpl {
 	}
 }
 
-func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
+func (s ServiceImpl) Create(model models.Endpoint) (models.Endpoint, error) {
 	entityExists, endpointExists, err := s.repo.Exists(model)
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
@@ -38,12 +38,12 @@ func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
 			err = errs.Unknown
 		}
 
-		return shared.Endpoint{}, err
+		return models.Endpoint{}, err
 	} else if !entityExists {
 		// FIXME. Is not errs.IdMissingInStorage error enough?
-		return shared.Endpoint{}, TryingToAddEndpointToMissingEntity
+		return models.Endpoint{}, TryingToAddEndpointToMissingEntity
 	} else if endpointExists {
-		return shared.Endpoint{}, TryingToCreateEndpointThatExists
+		return models.Endpoint{}, TryingToCreateEndpointThatExists
 	}
 
 	model.Id = models.Id(uuid4.New().String())
@@ -61,7 +61,7 @@ func (s ServiceImpl) Create(model shared.Endpoint) (shared.Endpoint, error) {
 	return endpoint, err
 }
 
-func (s ServiceImpl) Update(model shared.Endpoint) (shared.Endpoint, error) {
+func (s ServiceImpl) Update(model models.Endpoint) (models.Endpoint, error) {
 	_, endpointExists, err := s.repo.Exists(model)
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
@@ -76,10 +76,10 @@ func (s ServiceImpl) Update(model shared.Endpoint) (shared.Endpoint, error) {
 			err = errs.Unknown
 		}
 
-		return shared.Endpoint{}, err
+		return models.Endpoint{}, err
 	} else if !endpointExists {
 		// FIXME. Is not errs.IdMissingInStorage error enough?
-		return shared.Endpoint{}, TryingToUpdateMissingEndpoint
+		return models.Endpoint{}, TryingToUpdateMissingEndpoint
 	}
 
 	endpoint, err := s.repo.Update(model)

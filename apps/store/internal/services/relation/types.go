@@ -1,14 +1,14 @@
 package relation
 
 import (
+	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/operations"
-	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
 
-type Service = operations.CRD[shared.Relation]
+type Service = operations.CRD[models.Relation]
 
 type Repo interface {
-	operations.CRD[shared.Relation]
+	operations.CRD[models.Relation]
 	// PartsExist - expected to return two flags: entity existence and endpoint existence
-	PartsExist(model shared.Relation) (bool, bool, error)
+	PartsExist(model models.Relation) (bool, bool, error)
 }

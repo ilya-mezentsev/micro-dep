@@ -2,14 +2,13 @@ package mocks
 
 import (
 	"errors"
-
-	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
+	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 )
 
 var (
 	SomeError = errors.New("some-error")
 
-	Relations = []shared.Relation{
+	Relations = []models.Relation{
 		{
 			Id: "relation-1",
 		},
@@ -21,7 +20,7 @@ var (
 		},
 	}
 
-	Endpoints = []shared.Endpoint{
+	Endpoints = []models.Endpoint{
 		{
 			Id: "endpoint-1",
 		},
@@ -42,7 +41,7 @@ var (
 		},
 	}
 
-	Entities = []shared.Entity{
+	Entities = []models.Entity{
 		{
 			Id:        "some-id-1",
 			Endpoints: Endpoints[:3],

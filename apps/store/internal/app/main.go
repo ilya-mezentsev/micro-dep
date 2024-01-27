@@ -30,7 +30,7 @@ func Main() {
 	web.Start(
 		settings.Web,
 		servicesFactory.Services,
-		authMiddleware.ByCookie(),
+		authMiddleware.ByToken(),
 		logger,
 	)
 }

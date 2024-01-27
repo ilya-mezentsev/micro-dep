@@ -18,7 +18,7 @@ import (
 func TestServiceImpl_Create(t *testing.T) {
 	tests := []struct {
 		name            string
-		model           shared.Endpoint
+		model           models.Endpoint
 		mockConstructor func() Repo
 		expected        error
 	}{
@@ -28,7 +28,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
 				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(mock.Anything).Return(shared.Endpoint{}, nil)
+				m.EXPECT().Create(mock.Anything).Return(models.Endpoint{}, nil)
 
 				return m
 			},
@@ -89,7 +89,7 @@ func TestServiceImpl_Create(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
 				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, false, nil)
-				m.EXPECT().Create(mock.Anything).Return(shared.Endpoint{}, sharedMocks.SomeError)
+				m.EXPECT().Create(mock.Anything).Return(models.Endpoint{}, sharedMocks.SomeError)
 
 				return m
 			},
@@ -110,9 +110,9 @@ func TestServiceImpl_Create(t *testing.T) {
 func TestServiceImpl_Update(t *testing.T) {
 	tests := []struct {
 		name            string
-		model           shared.Endpoint
+		model           models.Endpoint
 		mockConstructor func() Repo
-		expectedModel   shared.Endpoint
+		expectedModel   models.Endpoint
 		expectedError   error
 	}{
 		{
@@ -138,7 +138,7 @@ func TestServiceImpl_Update(t *testing.T) {
 
 				return m
 			},
-			expectedModel: shared.Endpoint{},
+			expectedModel: models.Endpoint{},
 			expectedError: shared.NotFoundById,
 		},
 
@@ -151,7 +151,7 @@ func TestServiceImpl_Update(t *testing.T) {
 
 				return m
 			},
-			expectedModel: shared.Endpoint{},
+			expectedModel: models.Endpoint{},
 			expectedError: errs.Unknown,
 		},
 
@@ -164,7 +164,7 @@ func TestServiceImpl_Update(t *testing.T) {
 
 				return m
 			},
-			expectedModel: shared.Endpoint{},
+			expectedModel: models.Endpoint{},
 			expectedError: TryingToUpdateMissingEndpoint,
 		},
 
@@ -174,11 +174,11 @@ func TestServiceImpl_Update(t *testing.T) {
 			mockConstructor: func() Repo {
 				m := endpointMocks.NewMockRepo(t)
 				m.EXPECT().Exists(sharedMocks.Endpoints[0]).Return(true, true, nil)
-				m.EXPECT().Update(sharedMocks.Endpoints[0]).Return(shared.Endpoint{}, sharedMocks.SomeError)
+				m.EXPECT().Update(sharedMocks.Endpoints[0]).Return(models.Endpoint{}, sharedMocks.SomeError)
 
 				return m
 			},
-			expectedModel: shared.Endpoint{},
+			expectedModel: models.Endpoint{},
 			expectedError: errs.Unknown,
 		},
 	}

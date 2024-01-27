@@ -23,14 +23,14 @@ func NewServiceImpl(repo Repo, logger *slog.Logger) ServiceImpl {
 	}
 }
 
-func (s ServiceImpl) Create(model shared.Entity) (shared.Entity, error) {
+func (s ServiceImpl) Create(model models.Entity) (models.Entity, error) {
 	exists, err := s.repo.Exists(model.Name)
 	if err != nil {
 		s.logger.Error("Got an error while checking entity existence", slog.Any("err", err))
 
-		return shared.Entity{}, errs.Unknown
+		return models.Entity{}, errs.Unknown
 	} else if exists {
-		return shared.Entity{}, shared.AlreadyExists
+		return models.Entity{}, shared.AlreadyExists
 	}
 
 	model.Id = models.Id(uuid4.New().String())
@@ -48,7 +48,7 @@ func (s ServiceImpl) Create(model shared.Entity) (shared.Entity, error) {
 	return entity, err
 }
 
-func (s ServiceImpl) ReadAll() ([]shared.Entity, error) {
+func (s ServiceImpl) ReadAll() ([]models.Entity, error) {
 	entities, err := s.repo.ReadAll()
 	if err != nil {
 		s.logger.Error("Got an error while reading all entities", slog.Any("err", err))
@@ -58,7 +58,7 @@ func (s ServiceImpl) ReadAll() ([]shared.Entity, error) {
 	return entities, err
 }
 
-func (s ServiceImpl) ReadOne(id models.Id) (shared.Entity, error) {
+func (s ServiceImpl) ReadOne(id models.Id) (models.Entity, error) {
 	m, err := s.repo.ReadOne(id)
 	if errors.Is(err, errs.IdMissingInStorage) {
 		err = shared.NotFoundById
@@ -75,7 +75,7 @@ func (s ServiceImpl) ReadOne(id models.Id) (shared.Entity, error) {
 	return m, err
 }
 
-func (s ServiceImpl) Update(model shared.Entity) (shared.Entity, error) {
+func (s ServiceImpl) Update(model models.Entity) (models.Entity, error) {
 	endpointsInUse, err := s.repo.FetchRelations(model.Id)
 	if err != nil {
 		if errors.Is(err, errs.IdMissingInStorage) {
@@ -90,9 +90,9 @@ func (s ServiceImpl) Update(model shared.Entity) (shared.Entity, error) {
 			err = errs.Unknown
 		}
 
-		return shared.Entity{}, err
+		return models.Entity{}, err
 	} else if !s.checkAllEndpointsInUseRemained(model, endpointsInUse) {
-		return shared.Entity{}, TryingToRemoveEndpointThatIsInUse
+		return models.Entity{}, TryingToRemoveEndpointThatIsInUse
 	}
 
 	// fixme: should we consider situation when entity is deleted here?
@@ -110,7 +110,7 @@ func (s ServiceImpl) Update(model shared.Entity) (shared.Entity, error) {
 	return entity, err
 }
 
-func (s ServiceImpl) checkAllEndpointsInUseRemained(model shared.Entity, endpointsInUse []shared.Endpoint) bool {
+func (s ServiceImpl) checkAllEndpointsInUseRemained(model models.Entity, endpointsInUse []models.Endpoint) bool {
 	newEndpoints := s.makeEndpointsMap(model.Endpoints)
 	for _, endpointInUse := range endpointsInUse {
 		if _, ok := newEndpoints[endpointInUse.Id]; !ok {
@@ -121,7 +121,7 @@ func (s ServiceImpl) checkAllEndpointsInUseRemained(model shared.Entity, endpoin
 	return true
 }
 
-func (s ServiceImpl) makeEndpointsMap(endpoints []shared.Endpoint) map[models.Id]struct{} {
+func (s ServiceImpl) makeEndpointsMap(endpoints []models.Endpoint) map[models.Id]struct{} {
 	result := make(map[models.Id]struct{}, len(endpoints))
 	for _, endpoint := range endpoints {
 		result[endpoint.Id] = struct{}{}

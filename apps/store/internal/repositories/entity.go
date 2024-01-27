@@ -9,7 +9,6 @@ import (
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
-	"github.com/ilya-mezentsev/micro-dep/store/internal/services/shared"
 )
 
 const (
@@ -46,30 +45,30 @@ func newEntity(db *sqlx.DB, accountId models.Id) entity {
 	return entity{db: db, accountId: accountId}
 }
 
-func (e entity) Create(model shared.Entity) (shared.Entity, error) {
+func (e entity) Create(model models.Entity) (models.Entity, error) {
 	tx, err := e.db.Beginx()
 	if err != nil {
-		return shared.Entity{}, err
+		return models.Entity{}, err
 	}
 	//goland:noinspection ALL
 	defer tx.Rollback()
 
 	_, err = tx.NamedExec(addEntityQuery, entityProxy{AccountId: string(e.accountId)}.fromEntity(model))
 	if err != nil {
-		return shared.Entity{}, err
+		return models.Entity{}, err
 	}
 
 	for i := range model.Endpoints {
 		_, err = tx.NamedExec(addEndpointQuery, endpointProxy{}.fromEndpoint(model.Endpoints[i]))
 		if err != nil {
-			return shared.Entity{}, err
+			return models.Entity{}, err
 		}
 	}
 
 	return model, tx.Commit()
 }
 
-func (e entity) ReadAll() ([]shared.Entity, error) {
+func (e entity) ReadAll() ([]models.Entity, error) {
 	var proxies []entityProxy
 	err := e.db.Select(&proxies, entitiesQuery, string(e.accountId))
 	if err != nil {
@@ -84,7 +83,7 @@ func (e entity) ReadAll() ([]shared.Entity, error) {
 	}
 
 	entityId2Endpoints := e.entityId2Endpoints(endpointsProxies, len(proxies))
-	result := make([]shared.Entity, len(proxies))
+	result := make([]models.Entity, len(proxies))
 	for i, proxy := range proxies {
 		entityModel := proxy.toEntity()
 		entityModel.Endpoints = entityId2Endpoints[entityModel.Id]
@@ -104,8 +103,8 @@ func (e entity) entitiesIds(proxies []entityProxy) []string {
 	return result
 }
 
-func (e entity) entityId2Endpoints(endpointsProxies []endpointProxy, count int) map[models.Id][]shared.Endpoint {
-	result := make(map[models.Id][]shared.Endpoint, count)
+func (e entity) entityId2Endpoints(endpointsProxies []endpointProxy, count int) map[models.Id][]models.Endpoint {
+	result := make(map[models.Id][]models.Endpoint, count)
 	for _, ep := range endpointsProxies {
 		endpointModel := ep.toEndpoint()
 		result[endpointModel.EntityId] = append(result[endpointModel.EntityId], endpointModel)
@@ -114,7 +113,7 @@ func (e entity) entityId2Endpoints(endpointsProxies []endpointProxy, count int) 
 	return result
 }
 
-func (e entity) ReadOne(id models.Id) (shared.Entity, error) {
+func (e entity) ReadOne(id models.Id) (models.Entity, error) {
 	var proxy entityProxy
 	err := e.db.Get(&proxy, entityQuery, string(e.accountId), string(id))
 	if err != nil {
@@ -122,17 +121,17 @@ func (e entity) ReadOne(id models.Id) (shared.Entity, error) {
 			err = errs.IdMissingInStorage
 		}
 
-		return shared.Entity{}, err
+		return models.Entity{}, err
 	}
 
 	var endpointProxies []endpointProxy
 	err = e.db.Select(&endpointProxies, entitiesEndpointsQuery, pq.Array([]string{proxy.Id}))
 	if err != nil {
-		return shared.Entity{}, err
+		return models.Entity{}, err
 	}
 
 	result := proxy.toEntity()
-	result.Endpoints = make([]shared.Endpoint, len(endpointProxies))
+	result.Endpoints = make([]models.Endpoint, len(endpointProxies))
 	for i, ep := range endpointProxies {
 		result.Endpoints[i] = ep.toEndpoint()
 	}
@@ -140,23 +139,23 @@ func (e entity) ReadOne(id models.Id) (shared.Entity, error) {
 	return result, nil
 }
 
-func (e entity) Update(model shared.Entity) (shared.Entity, error) {
+func (e entity) Update(model models.Entity) (models.Entity, error) {
 	tx, err := e.db.Beginx()
 	if err != nil {
-		return shared.Entity{}, err
+		return models.Entity{}, err
 	}
 	//goland:noinspection ALL
 	defer tx.Rollback()
 
 	_, err = tx.Exec(updateEntityQuery, string(model.Id), model.Description)
 	if err != nil {
-		return shared.Entity{}, err
+		return models.Entity{}, err
 	}
 
 	for _, endpointModel := range model.Endpoints {
 		_, err = tx.NamedExec(updateEndpointQuery, endpointProxy{}.fromEndpoint(endpointModel))
 		if err != nil {
-			return shared.Entity{}, err
+			return models.Entity{}, err
 		}
 	}
 
@@ -176,14 +175,14 @@ func (e entity) Exists(name string) (bool, error) {
 	return result, err
 }
 
-func (e entity) FetchRelations(entityId models.Id) ([]shared.Endpoint, error) {
+func (e entity) FetchRelations(entityId models.Id) ([]models.Endpoint, error) {
 	var proxies []endpointProxy
 	err := e.db.Select(&proxies, endpointsInUseQuery, string(entityId))
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]shared.Endpoint, len(proxies))
+	result := make([]models.Endpoint, len(proxies))
 	for i, proxy := range proxies {
 		result[i] = proxy.toEndpoint()
 	}
@@ -191,7 +190,7 @@ func (e entity) FetchRelations(entityId models.Id) ([]shared.Endpoint, error) {
 	return result, nil
 }
 
-func (ep entityProxy) fromEntity(e shared.Entity) entityProxy {
+func (ep entityProxy) fromEntity(e models.Entity) entityProxy {
 	return entityProxy{
 		Id:          string(e.Id),
 		AccountId:   ep.AccountId,
@@ -201,8 +200,8 @@ func (ep entityProxy) fromEntity(e shared.Entity) entityProxy {
 	}
 }
 
-func (ep entityProxy) toEntity() shared.Entity {
-	return shared.Entity{
+func (ep entityProxy) toEntity() models.Entity {
+	return models.Entity{
 		Id:          models.Id(ep.Id),
 		AuthorId:    models.Id(ep.AuthorId),
 		Name:        ep.Name,
