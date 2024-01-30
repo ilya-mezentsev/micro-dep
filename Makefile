@@ -3,6 +3,7 @@ APPS_DIR := $(ROOT_DIR)/apps
 
 USER_DIR := $(APPS_DIR)/user
 STORE_DIR := $(APPS_DIR)/store
+DIAGRAM_DIR := $(APPS_DIR)/diagram
 GOMODCACHE_DIR := $(APPS_DIR)/deps
 
 TESTS_DIR := $(ROOT_DIR)/tests
@@ -15,9 +16,9 @@ DOCKER_COMPOSE_ENTRYPOINT := $(ROOT_DIR)/docker-compose.yaml
 ENTRYPOINT := cmd/main.go
 COMPILATION_OUTPUT := compiled/main
 
-mocks: store-mocks user-mocks
+mocks: store-mocks user-mocks diagram-mocks
 
-build: store-build user-build
+build: store-build user-build diagram-build
 
 run: down build
 	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up
@@ -25,9 +26,9 @@ run: down build
 down:
 	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) down -v
 
-test: store-test user-test
+test: store-test user-test diagram-test
 
-tidy: store-tidy user-tidy
+tidy: store-tidy user-tidy diagram-tidy
 
 test-all: test e2e-test
 
@@ -43,34 +44,64 @@ e2e-req:
 e2e-setup: e2e-venv e2e-req
 
 user-run:
-	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
+	@$(MAKE) --no-print-directory APP_DIR=$(USER_DIR) app-run
 
 user-build:
-	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go build -o $(COMPILATION_OUTPUT) $(ENTRYPOINT)
+	@$(MAKE) --no-print-directory APP_DIR=$(USER_DIR) app-build
 
 user-tidy:
-	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go mod tidy
+	@$(MAKE) --no-print-directory APP_DIR=$(USER_DIR) app-tidy
 
 user-mocks:
-	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) mockery
+	@$(MAKE) --no-print-directory APP_DIR=$(USER_DIR) app-mocks
 
 user-test:
-	cd $(USER_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go test -cover ./internal/... | { grep -v "no test files"; true; }
+	@$(MAKE) --no-print-directory APP_DIR=$(USER_DIR) app-test
 
 store-run:
-	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
+	@$(MAKE) --no-print-directory APP_DIR=$(STORE_DIR) app-run
 
 store-build:
-	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go build -o $(COMPILATION_OUTPUT) $(ENTRYPOINT)
+	@$(MAKE) --no-print-directory APP_DIR=$(STORE_DIR) app-build
 
 store-tidy:
-	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go mod tidy
+	@$(MAKE) --no-print-directory APP_DIR=$(STORE_DIR) app-tidy
 
 store-mocks:
-	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) mockery
+	@$(MAKE) --no-print-directory APP_DIR=$(STORE_DIR) app-mocks
 
 store-test:
-	cd $(STORE_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go test -cover ./internal/... | { grep -v "no test files"; true; }
+	@$(MAKE) --no-print-directory APP_DIR=$(STORE_DIR) app-test
+
+diagram-run:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-run
+
+diagram-build:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-build
+
+diagram-tidy:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-tidy
+
+diagram-mocks:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-mocks
+
+diagram-test:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-test
+
+app-run:
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
+
+app-build:
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go build -o $(COMPILATION_OUTPUT) $(ENTRYPOINT)
+
+app-tidy:
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go mod tidy
+
+app-mocks:
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) mockery
+
+app-test:
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go test -cover ./internal/... | { grep -v "no test files"; true; }
 
 db-run:
 	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up -d db

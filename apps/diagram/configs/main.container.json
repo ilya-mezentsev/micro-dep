@@ -1,0 +1,11 @@
+{
+  "web": {
+    "port": 8079,
+    "domain": "0.0.0.0"
+  },
+  "store": {
+    "entities_address": "http://store:8080/api/dependencies/entities",
+    "relations_address": "http://store:8080/api/dependencies/relations",
+    "timeout_milliseconds": 1000
+  }
+}

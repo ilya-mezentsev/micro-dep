@@ -23,6 +23,17 @@ services:
     depends_on:
       - db
 
+  diagram:
+    image: ubuntu:latest
+    command: sh -c "CONFIG_PATH=/etc/micro-dep/services/diagram/configs/main.json /opt/micro-dep/services/diagram/main"
+    volumes:
+      - ./apps/diagram/compiled/main:/opt/micro-dep/services/diagram/main
+      - ./apps/diagram/configs/main.container.json:/etc/micro-dep/services/diagram/configs/main.json
+    ports:
+      - "8079:8079"
+    depends_on:
+      - store
+
   db:
     image: postgres:latest
     ports:
@@ -44,3 +55,4 @@ services:
     depends_on:
       - user
       - store
+      - diagram

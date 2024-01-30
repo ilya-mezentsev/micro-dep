@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: Micro-dep diagram service API
+  description: Micro-dep diagram service API
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000/api/diagram'
+
+paths:
+  /{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          example: c5d6f777-8195-4908-af7d-6e3c1cd2460e
+        required: true
+        description: Account id
+
+    get:
+      summary: Download account's relations diagram
+      responses:
+        200:
+          description: Successfully created diagram
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+        401:
+          description: Unable to authorized account by provided id
+        500:
+          description: Internal error

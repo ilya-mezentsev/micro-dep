@@ -1,0 +1,15 @@
+with-expecter: true
+dir: "{{.InterfaceDir}}/mocks"
+filename: "{{.InterfaceName}}_mock.go"
+mockname: "Mock{{.InterfaceName}}"
+outpkg: "{{.PackageName}}_mocks"
+packages:
+    github.com/ilya-mezentsev/micro-dep/diagram/internal/services/draw:
+        interfaces:
+            D2Client:
+
+    github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram:
+        interfaces:
+            EntitiesFetcher:
+            RelationsFetcher:
+            DrawService:
