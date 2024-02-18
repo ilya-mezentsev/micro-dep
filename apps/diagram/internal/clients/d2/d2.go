@@ -45,7 +45,7 @@ func (c Client) Draw(script string) (string, error) {
 	}
 	renderOpts := &d2svg.RenderOpts{
 		Pad:     go2.Pointer(int64(5)),
-		ThemeID: &d2themescatalog.GrapeSoda.ID,
+		ThemeID: &d2themescatalog.TerminalGrayscale.ID,
 	}
 	compileOpts := &d2lib.CompileOptions{
 		LayoutResolver: layoutResolver,

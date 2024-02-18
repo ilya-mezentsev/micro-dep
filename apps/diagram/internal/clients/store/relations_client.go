@@ -25,7 +25,7 @@ func (rf RelationsFetcher) Fetch(accountId models.Id) ([]models.Relation, error)
 		Address: rf.relationsAddress,
 		Timeout: rf.timeout,
 		Headers: map[string]string{
-			middleware.TokenName: string(accountId),
+			middleware.HeaderAccountIdName: string(accountId),
 		},
 	})
 }

@@ -99,25 +99,25 @@ const expectedResult = `
 
 	foo: {
 		
-			foo-e-1: /api/foo/e/1
+			foo-e-1: |bash /api/foo/e/1 |
 		
-			foo-e-2: /api/foo/e/2
+			foo-e-2: |bash /api/foo/e/2 |
 		
 	}
 
 	bar: {
 		
-			bar-e-1: /api/bar/e/1
+			bar-e-1: |bash /api/bar/e/1 |
 		
-			bar-e-2: /api/bar/e/2
+			bar-e-2: |bash /api/bar/e/2 |
 		
 	}
 
 	baz: {
 		
-			baz-e-1: /api/baz/e/1
+			baz-e-1: |bash /api/baz/e/1 |
 		
-			baz-e-2: /api/baz/e/2
+			baz-e-2: |bash /api/baz/e/2 |
 		
 	}
 

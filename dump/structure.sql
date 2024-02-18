@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS author(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
     account_id VARCHAR(36) REFERENCES account(id),
 
-    username VARCHAR(42) UNIQUE NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(32) NOT NULL,
     registered_at BIGINT NOT NULL
 );

@@ -16,7 +16,8 @@ import (
 func Start(
 	webSettings configs.Web,
 	servicesFactory func(id models.Id) services.Services,
-	authMiddleware gin.HandlerFunc,
+	authByCookie gin.HandlerFunc,
+	authByHeader gin.HandlerFunc,
 	logger *slog.Logger,
 ) {
 
@@ -29,7 +30,7 @@ func Start(
 
 	apiGroup := r.Group("/api/dependencies")
 
-	apiGroup.Use(authMiddleware)
+	apiGroup.Use(authByCookie)
 
 	entityController := controllers.NewEntity(servicesFactory)
 	apiGroup.GET("/entities", entityController.ReadAll)
@@ -47,6 +48,13 @@ func Start(
 	apiGroup.GET("/relations", relationController.ReadAll)
 	apiGroup.POST("/relation", relationController.Create)
 	apiGroup.DELETE("/relation/:id", relationController.Delete)
+
+	internalApiGroup := r.Group("/api/dependencies/internal")
+
+	internalApiGroup.Use(authByHeader)
+
+	internalApiGroup.GET("/entities", entityController.ReadAll)
+	internalApiGroup.GET("/relations", relationController.ReadAll)
 
 	fmt.Printf("Listening port %d\n", webSettings.Port)
 	err := r.Run(fmt.Sprintf("%s:%d", webSettings.Domain, webSettings.Port))

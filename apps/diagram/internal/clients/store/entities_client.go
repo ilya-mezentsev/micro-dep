@@ -25,7 +25,7 @@ func (ef EntitiesFetcher) Fetch(accountId models.Id) ([]models.Entity, error) {
 		Address: ef.entitiesAddress,
 		Timeout: ef.timeout,
 		Headers: map[string]string{
-			middleware.TokenName: string(accountId),
+			middleware.HeaderAccountIdName: string(accountId),
 		},
 	})
 }

@@ -26,3 +26,4 @@ go.work
 venv
 __pycache__
 compiled
+exps

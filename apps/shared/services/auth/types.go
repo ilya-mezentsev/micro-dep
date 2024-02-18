@@ -9,6 +9,7 @@ import (
 type (
 	TokenReaderRepo interface {
 		AuthorizedAccountId(token string, authorizedTill time.Time) (AuthorizedIds, error)
+		AccountIdExists(accountId models.Id) (bool, error)
 	}
 
 	AuthorizedIds struct {

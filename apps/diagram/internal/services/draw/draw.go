@@ -12,7 +12,7 @@ const tpl = `
 {{ range $entity := .Entities }}
 	{{ $entity.Name }}: {
 		{{ range $endpoint := $entity.Endpoints }}
-			{{ $endpoint.Id }}: {{ $endpoint.Address }}
+			{{ $endpoint.Id }}: |bash {{ $endpoint.Address }} |
 		{{ end }}
 	}
 {{ end }}

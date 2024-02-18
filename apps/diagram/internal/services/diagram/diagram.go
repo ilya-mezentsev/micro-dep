@@ -77,8 +77,7 @@ func (s Service) Draw(accountId models.Id) (string, error) {
 	if err != nil {
 		s.logger.Error(
 			"Got an error while drawing diagram",
-			slog.Any("entities-error", entitiesErr),
-			slog.Any("relations-error", relationsErr),
+			slog.Any("error", err),
 			slog.String("account-id", string(accountId)),
 		)
 

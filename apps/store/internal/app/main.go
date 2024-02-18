@@ -31,7 +31,8 @@ func Main() {
 	web.Start(
 		settings.Web,
 		servicesFactory.Services,
-		authMiddleware.ByToken(),
+		authMiddleware.ByCookieToken(),
+		authMiddleware.ByHeaderAccountId(),
 		logger,
 	)
 }

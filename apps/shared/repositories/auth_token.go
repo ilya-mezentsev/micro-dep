@@ -19,6 +19,8 @@ const (
 	INNER JOIN auth_token at ON a.id = at.author_id
 	WHERE at.value = $1 AND at.expired_at > $2
 	`
+
+	accountIdExistsQuery = `SELECT EXISTS(SELECT 1 FROM account WHERE id = $1)`
 )
 
 type (
@@ -49,4 +51,14 @@ func (a AuthToken) AuthorizedAccountId(token string, authorizedTill time.Time) (
 		AuthorId:  models.Id(ids.AuthorId),
 		AccountId: models.Id(ids.AccountId),
 	}, err
+}
+
+func (a AuthToken) AccountIdExists(accountId models.Id) (bool, error) {
+	var exists bool
+	err := a.db.Get(&exists, accountIdExistsQuery, string(accountId))
+	if errors.Is(err, sql.ErrNoRows) {
+		err = errs.IdMissingInStorage
+	}
+
+	return exists, err
 }

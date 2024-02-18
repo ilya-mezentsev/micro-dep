@@ -8,16 +8,18 @@ import lorem
 base_url = 'http://localhost:8000/api/dependencies'
 
 entities_url = f'{base_url}/entities'
+internal_entities_url = f'{base_url}/internal/entities'
 entity_url = f'{base_url}/entity'
 
 relation_url = f'{base_url}/relation'
 
-account_id = 'f93676f8f379c74cefc0d9959d843ac0'
+account_id = 'c5d6f777-8195-4908-af7d-6e3c1cd2460e'
+auth_token = 'f93676f8f379c74cefc0d9959d843ac0'
 auth_cookie = {
-    'X-Auth-Token': account_id,
+    'X-Auth-Token': auth_token,
 }
 auth_header = {
-    **auth_cookie,
+    'X-Account-Id': account_id,
 }
 
 
@@ -26,7 +28,7 @@ def test_get_all_entities() -> None:
 
 
 def test_get_all_entities_auth_by_header() -> None:
-    d = requests.get(entities_url, headers=auth_header).json()['data']
+    d = requests.get(internal_entities_url, headers=auth_header).json()['data']
     assert len(d) > 0
 
 
