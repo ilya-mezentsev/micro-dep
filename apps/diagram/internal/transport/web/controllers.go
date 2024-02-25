@@ -26,8 +26,12 @@ func Start(
 
 	apiGroup := r.Group("/api/diagram")
 
-	diagramController := controllers.NewDiagram(services.Diagram())
+	diagramController := controllers.NewDiagram(
+		services.StatefulDiagram(),
+		services.StatelessDiagram(),
+	)
 	apiGroup.GET("/:id", diagramController.Download)
+	apiGroup.POST("/", diagramController.Draw)
 
 	fmt.Printf("Listening port %d\n", webSettings.Port)
 	err := r.Run(fmt.Sprintf("%s:%d", webSettings.Domain, webSettings.Port))

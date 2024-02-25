@@ -1,7 +1,6 @@
-package diagram
+package stateful
 
 import (
-	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/shared/types"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 )
 
@@ -14,10 +13,5 @@ type (
 	RelationsFetcher interface {
 		// Fetch returns one of: relations, api error message or error
 		Fetch(accountId models.Id) ([]models.Relation, error)
-	}
-
-	DrawService interface {
-		// DrawDiagram returns path to diagram file or error
-		DrawDiagram(rdp types.RelationsDiagramData) (string, error)
 	}
 )

@@ -1,17 +1,17 @@
 package clients
 
 import (
-	"github.com/ilya-mezentsev/micro-dep/diagram/internal/clients/d2"
 	"time"
 
+	"github.com/ilya-mezentsev/micro-dep/diagram/internal/clients/d2"
 	"github.com/ilya-mezentsev/micro-dep/diagram/internal/clients/store"
-	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram"
+	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/stateful"
 	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/draw"
 )
 
 type Clients struct {
-	entitiesClient  diagram.EntitiesFetcher
-	relationsClient diagram.RelationsFetcher
+	entitiesClient  stateful.EntitiesFetcher
+	relationsClient stateful.RelationsFetcher
 	d2client        draw.D2Client
 }
 
@@ -27,11 +27,11 @@ func New(
 	}
 }
 
-func (c Clients) Entities() diagram.EntitiesFetcher {
+func (c Clients) Entities() stateful.EntitiesFetcher {
 	return c.entitiesClient
 }
 
-func (c Clients) Relations() diagram.RelationsFetcher {
+func (c Clients) Relations() stateful.RelationsFetcher {
 	return c.relationsClient
 }
 

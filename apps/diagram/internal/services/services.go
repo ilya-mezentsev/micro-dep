@@ -4,25 +4,38 @@ import (
 	"log/slog"
 
 	"github.com/ilya-mezentsev/micro-dep/diagram/internal/clients"
-	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram"
+	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/stateful"
+	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/stateless"
 	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/draw"
 )
 
 type Services struct {
-	diagram diagram.Service
+	statefulDiagram  stateful.Service
+	statelessDiagram stateless.Service
 }
 
 func New(clients clients.Clients, logger *slog.Logger) Services {
+	drawService := draw.New(clients.D2())
+
 	return Services{
-		diagram: diagram.New(
+		statefulDiagram: stateful.New(
 			clients.Entities(),
 			clients.Relations(),
-			draw.New(clients.D2()),
+			drawService,
+			logger,
+		),
+
+		statelessDiagram: stateless.New(
+			drawService,
 			logger,
 		),
 	}
 }
 
-func (s Services) Diagram() diagram.Service {
-	return s.diagram
+func (s Services) StatefulDiagram() stateful.Service {
+	return s.statefulDiagram
+}
+
+func (s Services) StatelessDiagram() stateless.Service {
+	return s.statelessDiagram
 }

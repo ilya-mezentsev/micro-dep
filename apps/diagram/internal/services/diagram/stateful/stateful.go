@@ -1,10 +1,11 @@
-package diagram
+package stateful
 
 import (
 	"errors"
 	"log/slog"
 	"sync"
 
+	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/shared"
 	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/shared/types"
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
@@ -13,14 +14,14 @@ import (
 type Service struct {
 	entitiesFetcher  EntitiesFetcher
 	relationsFetcher RelationsFetcher
-	drawService      DrawService
+	drawService      shared.DrawService
 	logger           *slog.Logger
 }
 
 func New(
 	entitiesFetcher EntitiesFetcher,
 	relationsFetcher RelationsFetcher,
-	drawService DrawService,
+	drawService shared.DrawService,
 	logger *slog.Logger,
 ) Service {
 

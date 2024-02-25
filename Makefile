@@ -30,6 +30,8 @@ test: store-test user-test diagram-test
 
 tidy: store-tidy user-tidy diagram-tidy
 
+vet: store-vet user-vet diagram-vet
+
 test-all: test e2e-test
 
 e2e-test:
@@ -58,6 +60,9 @@ user-mocks:
 user-test:
 	@$(MAKE) --no-print-directory APP_DIR=$(USER_DIR) app-test
 
+user-vet:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-vet
+
 store-run:
 	@$(MAKE) --no-print-directory APP_DIR=$(STORE_DIR) app-run
 
@@ -72,6 +77,9 @@ store-mocks:
 
 store-test:
 	@$(MAKE) --no-print-directory APP_DIR=$(STORE_DIR) app-test
+
+store-vet:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-vet
 
 diagram-run:
 	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-run
@@ -88,6 +96,9 @@ diagram-mocks:
 diagram-test:
 	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-test
 
+diagram-vet:
+	@$(MAKE) --no-print-directory APP_DIR=$(DIAGRAM_DIR) app-vet
+
 app-run:
 	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) CONFIG_PATH=./configs/main.json go run $(ENTRYPOINT)
 
@@ -100,8 +111,12 @@ app-tidy:
 app-mocks:
 	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) mockery
 
+# about GOEXPERIMENT see https://github.com/golang/go/issues/65570
 app-test:
-	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go test -cover ./internal/... | { grep -v "no test files"; true; }
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) GOEXPERIMENT=nocoverageredesign go test -cover ./internal/... | { grep -v "no test files"; true; }
+
+app-vet:
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE_DIR) go vet ./internal/...
 
 db-run:
 	docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up -d db

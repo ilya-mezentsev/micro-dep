@@ -7,6 +7,36 @@ servers:
   - url: 'http://localhost:8000/api/diagram'
 
 paths:
+  /:
+    post:
+      summary: Create diagram from request data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entities'
+      responses:
+        200:
+          description: Successfully created diagram
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: Bad request (i.e. invalid JSON)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralClientError'
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+
   /{id}:
     parameters:
       - in: path
@@ -31,3 +61,60 @@ paths:
           description: Unable to authorized account by provided id
         500:
           description: Internal error
+
+components:
+  schemas:
+    Entities:
+      type: array
+      items:
+        $ref: '#/components/schemas/Entity'
+
+    Entity:
+      type: object
+      properties:
+        name:
+          type: string
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+      example:
+        name: service-1
+        endpoints:
+          - kind: get-endpoint
+            address: /api/v1/user
+        dependencies:
+          - name: service-2
+            endpoints:
+              - kind: post-endpoint
+                address: /api/v1/user/session
+              - kind: delete-endpoint
+                address: /api/v1/user/session
+
+    Endpoint:
+      type: object
+      properties:
+        kind:
+          type: string
+          example: get-endpoint
+        address:
+          type: string
+          example: /api/v1/user
+
+    GeneralClientError:
+      type: object
+      properties:
+        error:
+          type: string
+
+    UnknownError:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - unknown-error

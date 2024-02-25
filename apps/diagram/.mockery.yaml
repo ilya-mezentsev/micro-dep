@@ -8,7 +8,11 @@ packages:
         interfaces:
             D2Client:
 
-    github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram:
+    github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/shared:
+        interfaces:
+            DrawService:
+
+    github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/stateful:
         interfaces:
             EntitiesFetcher:
             RelationsFetcher:

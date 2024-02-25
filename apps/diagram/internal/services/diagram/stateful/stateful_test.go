@@ -1,4 +1,4 @@
-package diagram
+package stateful
 
 import (
 	"errors"
@@ -8,7 +8,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	diagramMocks "github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/mocks"
+	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/shared"
+	sharedMocks "github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/shared/mocks"
+	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/diagram/stateful/mocks"
 	"github.com/ilya-mezentsev/micro-dep/diagram/internal/services/shared/types"
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
 	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
@@ -24,21 +26,21 @@ func TestService_Draw(t *testing.T) {
 	tests := []struct {
 		name                string
 		accountId           models.Id
-		mocksConstructor    func() (EntitiesFetcher, RelationsFetcher, DrawService)
+		mocksConstructor    func() (EntitiesFetcher, RelationsFetcher, shared.DrawService)
 		expectedDiagramPath string
 		expectedError       error
 	}{
 		{
 			name:      "ok",
 			accountId: someAccountId,
-			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, DrawService) {
-				ef := diagramMocks.NewMockEntitiesFetcher(t)
+			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, shared.DrawService) {
+				ef := stateful_mocks.NewMockEntitiesFetcher(t)
 				ef.EXPECT().Fetch(someAccountId).Return(nil, nil)
 
-				rf := diagramMocks.NewMockRelationsFetcher(t)
+				rf := stateful_mocks.NewMockRelationsFetcher(t)
 				rf.EXPECT().Fetch(someAccountId).Return(nil, nil)
 
-				ds := diagramMocks.NewMockDrawService(t)
+				ds := sharedMocks.NewMockDrawService(t)
 				ds.EXPECT().DrawDiagram(types.RelationsDiagramData{
 					Entities:  nil,
 					Relations: nil,
@@ -53,11 +55,11 @@ func TestService_Draw(t *testing.T) {
 		{
 			name:      "error from entities fetcher",
 			accountId: someAccountId,
-			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, DrawService) {
-				ef := diagramMocks.NewMockEntitiesFetcher(t)
+			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, shared.DrawService) {
+				ef := stateful_mocks.NewMockEntitiesFetcher(t)
 				ef.EXPECT().Fetch(someAccountId).Return(nil, someError)
 
-				rf := diagramMocks.NewMockRelationsFetcher(t)
+				rf := stateful_mocks.NewMockRelationsFetcher(t)
 				rf.EXPECT().Fetch(someAccountId).Return(nil, nil)
 
 				return ef, rf, nil
@@ -68,11 +70,11 @@ func TestService_Draw(t *testing.T) {
 		{
 			name:      "error from relations fetcher",
 			accountId: someAccountId,
-			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, DrawService) {
-				ef := diagramMocks.NewMockEntitiesFetcher(t)
+			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, shared.DrawService) {
+				ef := stateful_mocks.NewMockEntitiesFetcher(t)
 				ef.EXPECT().Fetch(someAccountId).Return(nil, nil)
 
-				rf := diagramMocks.NewMockRelationsFetcher(t)
+				rf := stateful_mocks.NewMockRelationsFetcher(t)
 				rf.EXPECT().Fetch(someAccountId).Return(nil, someError)
 
 				return ef, rf, nil
@@ -83,11 +85,11 @@ func TestService_Draw(t *testing.T) {
 		{
 			name:      "error from entities AND relations fetcher",
 			accountId: someAccountId,
-			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, DrawService) {
-				ef := diagramMocks.NewMockEntitiesFetcher(t)
+			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, shared.DrawService) {
+				ef := stateful_mocks.NewMockEntitiesFetcher(t)
 				ef.EXPECT().Fetch(someAccountId).Return(nil, someError)
 
-				rf := diagramMocks.NewMockRelationsFetcher(t)
+				rf := stateful_mocks.NewMockRelationsFetcher(t)
 				rf.EXPECT().Fetch(someAccountId).Return(nil, someError)
 
 				return ef, rf, nil
@@ -98,14 +100,14 @@ func TestService_Draw(t *testing.T) {
 		{
 			name:      "error from draw service",
 			accountId: someAccountId,
-			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, DrawService) {
-				ef := diagramMocks.NewMockEntitiesFetcher(t)
+			mocksConstructor: func() (EntitiesFetcher, RelationsFetcher, shared.DrawService) {
+				ef := stateful_mocks.NewMockEntitiesFetcher(t)
 				ef.EXPECT().Fetch(someAccountId).Return(nil, nil)
 
-				rf := diagramMocks.NewMockRelationsFetcher(t)
+				rf := stateful_mocks.NewMockRelationsFetcher(t)
 				rf.EXPECT().Fetch(someAccountId).Return(nil, nil)
 
-				ds := diagramMocks.NewMockDrawService(t)
+				ds := sharedMocks.NewMockDrawService(t)
 				ds.EXPECT().DrawDiagram(types.RelationsDiagramData{
 					Entities:  nil,
 					Relations: nil,
