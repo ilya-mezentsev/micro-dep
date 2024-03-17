@@ -3,13 +3,13 @@ package repositories
 import (
 	"database/sql"
 	"errors"
-	"github.com/ilya-mezentsev/micro-dep/shared/services/auth"
-	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/errs"
+	"github.com/ilya-mezentsev/micro-dep/shared/services/auth"
+	"github.com/ilya-mezentsev/micro-dep/shared/types/models"
 )
 
 const (

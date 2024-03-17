@@ -8,20 +8,7 @@ import (
 )
 
 type (
-	ResponseBuilder interface {
-		EmptyOk()
-		Created()
-		Ok(response any)
-		NotImplemented()
-		InternalError(err error)
-		ClientError(err error)
-		UnauthorizedError(err error)
-		ConflictError(err error)
-		NotFoundError(err error)
-		EmptyNotFound()
-	}
-
-	responseBuilder struct {
+	ResponseBuilder struct {
 		context  *gin.Context
 		response any
 	}
@@ -36,48 +23,48 @@ type (
 )
 
 func MakeResponseBuilder(context *gin.Context) ResponseBuilder {
-	return responseBuilder{
+	return ResponseBuilder{
 		context: context,
 	}
 }
 
-func (r responseBuilder) InternalError(err error) {
+func (r ResponseBuilder) InternalError(err error) {
 	r.context.JSON(http.StatusInternalServerError, errorResponse{Error: cutError(err)})
 }
 
-func (r responseBuilder) NotImplemented() {
+func (r ResponseBuilder) NotImplemented() {
 	r.context.Status(http.StatusNotImplemented)
 }
 
-func (r responseBuilder) NotFoundError(err error) {
+func (r ResponseBuilder) NotFoundError(err error) {
 	r.context.JSON(http.StatusNotFound, errorResponse{Error: cutError(err)})
 }
 
-func (r responseBuilder) EmptyNotFound() {
+func (r ResponseBuilder) EmptyNotFound() {
 	r.context.AbortWithStatus(http.StatusNotFound)
 }
 
-func (r responseBuilder) ClientError(err error) {
+func (r ResponseBuilder) ClientError(err error) {
 	r.context.JSON(http.StatusBadRequest, errorResponse{Error: cutError(err)})
 }
 
-func (r responseBuilder) UnauthorizedError(err error) {
+func (r ResponseBuilder) UnauthorizedError(err error) {
 	r.context.JSON(http.StatusUnauthorized, errorResponse{Error: cutError(err)})
 }
 
-func (r responseBuilder) ConflictError(err error) {
+func (r ResponseBuilder) ConflictError(err error) {
 	r.context.JSON(http.StatusConflict, errorResponse{Error: cutError(err)})
 }
 
-func (r responseBuilder) Ok(response any) {
+func (r ResponseBuilder) Ok(response any) {
 	r.context.JSON(http.StatusOK, okResponse{Data: response})
 }
 
-func (r responseBuilder) Created() {
+func (r ResponseBuilder) Created() {
 	r.context.Status(http.StatusCreated)
 }
 
-func (r responseBuilder) EmptyOk() {
+func (r ResponseBuilder) EmptyOk() {
 	r.context.Status(http.StatusNoContent)
 }
 

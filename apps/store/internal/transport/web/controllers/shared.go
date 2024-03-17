@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/ilya-mezentsev/micro-dep/shared/transport/middleware"
@@ -141,7 +142,7 @@ func (cm controllerMixins[T]) prepare(context *gin.Context) (services.Services, 
 	if !exists {
 		rb.InternalError(errNoAccountIdInContext)
 
-		return services.Services{}, nil, errNoAccountIdInContext
+		return services.Services{}, shared.ResponseBuilder{}, errNoAccountIdInContext
 	}
 
 	return cm.servicesFactory(accountId.(models.Id)), rb, nil
