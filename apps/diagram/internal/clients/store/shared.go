@@ -10,8 +10,13 @@ import (
 )
 
 func fetch[T any](opts shared.Opts) (T, error) {
-	var result T
-	response, err := shared.Get(opts)
+	var (
+		result   T
+		response *http.Response
+		err      error
+	)
+
+	response, err = shared.Get(opts)
 	if err != nil {
 		return result, err
 	}
@@ -20,7 +25,8 @@ func fetch[T any](opts shared.Opts) (T, error) {
 	}()
 
 	if response.StatusCode == http.StatusOK {
-		responseBody, err := io.ReadAll(response.Body)
+		var responseBody []byte
+		responseBody, err = io.ReadAll(response.Body)
 		if err != nil {
 			return result, err
 		}

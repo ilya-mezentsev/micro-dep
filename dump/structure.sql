@@ -1,12 +1,14 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 
-CREATE TABLE IF NOT EXISTS account(
+DROP TABLE IF EXISTS account;
+CREATE TABLE account(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
 
     registered_at BIGINT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS author(
+DROP TABLE IF EXISTS author;
+CREATE TABLE author(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
     account_id VARCHAR(36) REFERENCES account(id),
 
@@ -15,7 +17,8 @@ CREATE TABLE IF NOT EXISTS author(
     registered_at BIGINT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS auth_token(
+DROP TABLE IF EXISTS auth_token;
+CREATE TABLE auth_token(
     author_id VARCHAR(36) REFERENCES author(id),
     value VARCHAR(36) UNIQUE NOT NULL,
 
@@ -23,7 +26,8 @@ CREATE TABLE IF NOT EXISTS auth_token(
     expired_at BIGINT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS entity(
+DROP TABLE IF EXISTS entity;
+CREATE TABLE entity(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
     account_id VARCHAR(36) REFERENCES account(id),
     author_id VARCHAR(36) REFERENCES author(id),
@@ -34,7 +38,8 @@ CREATE TABLE IF NOT EXISTS entity(
     UNIQUE (account_id, author_id, name)
 );
 
-CREATE TABLE IF NOT EXISTS entity_endpoint(
+DROP TABLE IF EXISTS entity_endpoint;
+CREATE TABLE entity_endpoint(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
 
     entity_id VARCHAR(36) REFERENCES entity(id) ON DELETE CASCADE,
@@ -44,7 +49,8 @@ CREATE TABLE IF NOT EXISTS entity_endpoint(
     UNIQUE (entity_id, kind, address)
 );
 
-CREATE TABLE IF NOT EXISTS dependency(
+DROP TABLE IF EXISTS dependency;
+CREATE TABLE dependency(
     id VARCHAR(36) DEFAULT GEN_RANDOM_UUID() PRIMARY KEY,
 
     from_id VARCHAR(36) REFERENCES entity(id),

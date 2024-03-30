@@ -50,8 +50,9 @@ func (e entity) Create(model models.Entity) (models.Entity, error) {
 	if err != nil {
 		return models.Entity{}, err
 	}
-	//goland:noinspection ALL
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
 	_, err = tx.NamedExec(addEntityQuery, entityProxy{AccountId: string(e.accountId)}.fromEntity(model))
 	if err != nil {
@@ -144,8 +145,9 @@ func (e entity) Update(model models.Entity) (models.Entity, error) {
 	if err != nil {
 		return models.Entity{}, err
 	}
-	//goland:noinspection ALL
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
 	_, err = tx.Exec(updateEntityQuery, string(model.Id), model.Description)
 	if err != nil {

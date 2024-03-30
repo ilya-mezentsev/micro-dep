@@ -59,7 +59,7 @@ func (s Service) buildRelationsDiagramData(entities []Entity) types.RelationsDia
 		}
 
 		for _, dependency := range entity.Dependencies {
-			endpointsModels := make([]models.Endpoint, 0, len(dependency.Endpoints))
+			var endpointsModels []models.Endpoint
 			dependencyModel, existingEndpoint := entityName2EntityModel[dependency.Name]
 			if existingEndpoint {
 				dependencyModel = s.mergeEndpoints(dependencyModel, dependency.Endpoints)
